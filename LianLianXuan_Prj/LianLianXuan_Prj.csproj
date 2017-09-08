@@ -53,7 +53,6 @@
     <Compile Include="Model\Block.cs" />
     <Compile Include="Model\Grid.cs" />
     <Compile Include="Model\Model.cs" />
-    <Compile Include="Model\Position.cs" />
     <Compile Include="View\MainView.cs" />
     <Compile Include="View\View.cs" />
     <Compile Include="Program.cs" />

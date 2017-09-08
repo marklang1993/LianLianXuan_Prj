@@ -40,8 +40,10 @@ namespace LianLianXuan_Prj
             this.Size = new Size(wigetWidth, wigetHeight); // Reset size of the main form
             Rectangle wigetSize = new Rectangle(0, 0, wigetWidth, wigetHeight);
             _viewManager = new ViewManager(this.CreateGraphics(), wigetSize);
+            // Init.Model
+            _mainModel = new Model.Model();
             // Bind all Views
-            _viewManager.Bind(new MainView());
+            _viewManager.Bind(new MainView(_mainModel));
             // Set Timer
             ViewUpdateTimer.Interval = 1000 / FPS;
 

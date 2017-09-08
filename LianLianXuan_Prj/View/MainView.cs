@@ -1,24 +1,32 @@
 ﻿using System;
 using System.Drawing;
 using System.Text;
+using LianLianXuan_Prj.Model;
 
 namespace LianLianXuan_Prj.View
 {
     public class MainView : View
     {
-        private Bitmap[] blockImages; // block images
+        private readonly Bitmap[] _blockImages; // block images
+        private Model.Model _model; // model
 
-        public MainView()
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="model">Game Model</param>
+        public MainView(Model.Model model)
         {
             // Load all block images
-            blockImages = new Bitmap[Model.Model.IMAGES_CNT];
+            _blockImages = new Bitmap[Model.Model.IMAGES_CNT];
             for (int i = 0; i < Model.Model.IMAGES_CNT; ++i)
             {
                 StringBuilder sb = new StringBuilder(@"images\");
                 sb.Append((i + 1).ToString());
                 sb.Append(".jpg");
-                blockImages[i] = new Bitmap(sb.ToString());
+                _blockImages[i] = new Bitmap(sb.ToString());
             }
+            // Init. Model
+            _model = model;
         }
 
         private void _paintBlock(Graphics g, int x, int y, int imageID)
@@ -42,17 +50,17 @@ namespace LianLianXuan_Prj.View
             int posX = x*(Model.Model.BLOCK_MARGIN + Model.Model.BLOCK_SIZE_X);
             int posY = y*(Model.Model.BLOCK_MARGIN + Model.Model.BLOCK_SIZE_Y);
             Rectangle rect = new Rectangle(posX, posY, Model.Model.BLOCK_SIZE_X, Model.Model.BLOCK_SIZE_Y);
-            g.DrawImage(blockImages[imageID], rect);
+            g.DrawImage(_blockImages[imageID], rect);
         }
 
         public override void Paint(Graphics g)
         {
+            Block[][] _map = _model.GetMap();
             for (int i = 1; i <= 10; ++i)
             {
                 for (int j = 1; j <= 8; ++j)
                 {
-                    int id = ((i*j - 1) + i - 1)%40;
-                    _paintBlock(g, i, j, id);
+                    _paintBlock(g, i, j, _map[i][j].GetImageId());
                 }
             }
         }

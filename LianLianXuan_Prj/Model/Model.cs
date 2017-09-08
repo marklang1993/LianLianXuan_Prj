@@ -17,5 +17,26 @@ namespace LianLianXuan_Prj.Model
         public const int BLOCK_SIZE_Y = 80;
         public const int BLOCK_MARGIN = 10; // Margin size
         public const int IMAGES_CNT = 40; // Count of images
+
+        // Members
+        private Grid _grid;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public Model()
+        {
+            _grid = new Grid();
+        }
+
+
+        /// <summary>
+        /// Get Map
+        /// </summary>
+        /// <returns></returns>
+        public Block[][] GetMap()
+        {
+            return _grid.GetMap();
+        }
     }
 }
