@@ -20,9 +20,9 @@ namespace LianLianXuan_Prj.Model
                 _map[i] = new Block[Model.TOT_BLOCK_CNT_Y];
             }
             // Init. all blocks to null blocks
-            for (int j = 1; j < Model.TOT_BLOCK_CNT_Y - 1; ++j)
+            for (int j = 0; j < Model.TOT_BLOCK_CNT_Y; ++j)
             {
-                for (int i = 1; i < Model.TOT_BLOCK_CNT_X - 1; ++i)
+                for (int i = 0; i < Model.TOT_BLOCK_CNT_X; ++i)
                 {
                     _map[i][j] = new Block(i, j, Block.NULL_TYPE);
                 }
@@ -90,7 +90,7 @@ namespace LianLianXuan_Prj.Model
             serializedBlocks.AddRange(_serialize());
             // Randomize
             Block[] randomizedBlocks = new Block[Model.GRID_BLOCK_CNT_X * Model.GRID_BLOCK_CNT_Y];
-            Random prng = new Random();
+            Random prng = new Random(10);
             int cnt = 0;
             while (serializedBlocks.Count != 0)
             {
@@ -120,6 +120,17 @@ namespace LianLianXuan_Prj.Model
         public Block[][] GetMap()
         {
             return _map;
+        }
+
+        /// <summary>
+        /// Get Block by Position
+        /// </summary>
+        /// <param name="pos">Position of Block</param>
+        /// <returns>NOTE: return null if coordinates are invalid.</returns>
+        public Block GetBlock(Position pos)
+        {
+            if (!Position.IsValid(pos.X, pos.Y)) return null;
+            return _map[pos.X][pos.Y];
         }
     
     }

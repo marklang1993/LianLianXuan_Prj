@@ -18,6 +18,13 @@ namespace LianLianXuan_Prj.Model
             Y = y;
         }
 
+        public static bool IsValid(int x, int y)
+        {
+            if (x < 0 || x >= Model.TOT_BLOCK_CNT_X) return false;
+            if (y < 0 || y >= Model.TOT_BLOCK_CNT_Y) return false;
+            return true;
+        }
+
         /// <summary>
         /// Determine 2 positions are same
         /// </summary>
@@ -26,6 +33,42 @@ namespace LianLianXuan_Prj.Model
         public bool IsEqual(Position pos)
         {
             return pos.X == X && pos.Y == Y;
+        }
+
+        /// <summary>
+        /// Return new position by move up 1 block
+        /// </summary>
+        /// <returns></returns>
+        public Position Up()
+        {
+            return new Position(X, Y - 1);
+        }
+
+        /// <summary>
+        /// Return new position by move down 1 block
+        /// </summary>
+        /// <returns></returns>
+        public Position Down()
+        {
+            return new Position(X, Y + 1);
+        }
+
+        /// <summary>
+        /// Return new position by move left 1 block
+        /// </summary>
+        /// <returns></returns>
+        public Position Left()
+        {
+            return new Position(X - 1, Y);
+        }
+
+        /// <summary>
+        /// Return new position by move right 1 block
+        /// </summary>
+        /// <returns></returns>
+        public Position Right()
+        {
+            return new Position(X + 1, Y);
         }
     }
 
@@ -42,9 +85,8 @@ namespace LianLianXuan_Prj.Model
         public Block(int x, int y, int type)
         {
             // Check
+            if (!Position.IsValid(x, y)) throw new Exception(@"Coordinates are Invalid!");
             if (type >= Model.IMAGES_CNT) throw new InvalidEnumArgumentException(@"Out of Type Index!");
-            if (x < 0 && x >= Model.GRID_BLOCK_CNT_X) throw new InvalidEnumArgumentException(@"Out of X Coordinate!");
-            if (y < 0 && y >= Model.GRID_BLOCK_CNT_Y) throw new InvalidEnumArgumentException(@"Out of Y Coordinate!");
             // Init.
             _pos = new Position(x, y);
             _type = type;
@@ -87,10 +129,17 @@ namespace LianLianXuan_Prj.Model
         /// <param name="y">Y Coordinate</param>
         public void ChangePos(int x, int y)
         {
-            if (x < 0 && x >= Model.GRID_BLOCK_CNT_X) throw new InvalidEnumArgumentException(@"Out of X Coordinate!");
-            if (y < 0 && y >= Model.GRID_BLOCK_CNT_Y) throw new InvalidEnumArgumentException(@"Out of Y Coordinate!");
-
+            if (!Position.IsValid(x, y)) throw new Exception(@"Coordinates are Invalid!");
             _pos = new Position(x, y);
+        }
+
+        /// <summary>
+        /// Get position
+        /// </summary>
+        /// <returns></returns>
+        public Position GetPos()
+        {
+            return _pos;
         }
 
         /// <summary>
@@ -100,6 +149,15 @@ namespace LianLianXuan_Prj.Model
         public bool IsNull()
         {
             return _type == NULL_TYPE;
+        }
+
+        /// <summary>
+        /// Determine type
+        /// </summary>
+        /// <returns></returns>
+        public static bool TypeEqual(Block left, Block right)
+        {
+            return left._type == right._type;
         }
     }
 }
