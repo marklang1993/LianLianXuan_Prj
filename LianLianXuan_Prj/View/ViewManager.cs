@@ -39,7 +39,7 @@ namespace LianLianXuan_Prj.View
             Graphics drawingGrphics = bufferedGraphics.Graphics;
 
             // Draw background
-            drawingGrphics.FillRectangle(new SolidBrush(Color.White), _wigetSize);
+            // drawingGrphics.FillRectangle(new SolidBrush(Color.White), _wigetSize);
             // Draw all views
             foreach (var viewComponent in _allViews)
             {

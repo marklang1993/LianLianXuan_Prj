@@ -35,6 +35,8 @@ namespace LianLianXuan_Prj.Model
                 serializedBlocks[i].ToValidBlock(i / 2);
             }
             _deserialize(serializedBlocks);
+            // Randomize
+            Randomize();
         }
 
         /// <summary>
@@ -76,6 +78,39 @@ namespace LianLianXuan_Prj.Model
                     ++cnt;
                 }
             }
+        }
+
+        /// <summary>
+        /// Randomize all blocks in play area
+        /// </summary>
+        public void Randomize()
+        {
+            // Serialize blocks in current play area
+            List<Block> serializedBlocks = new List<Block>();
+            serializedBlocks.AddRange(_serialize());
+            // Randomize
+            Block[] randomizedBlocks = new Block[Model.GRID_BLOCK_CNT_X * Model.GRID_BLOCK_CNT_Y];
+            Random prng = new Random();
+            int cnt = 0;
+            while (serializedBlocks.Count != 0)
+            {
+                int nextIndex = prng.Next(serializedBlocks.Count);
+                randomizedBlocks[cnt] = serializedBlocks.ElementAt(nextIndex);
+                serializedBlocks.RemoveAt(nextIndex);
+                ++cnt;
+            }
+            // Reset Position
+            cnt = 0;
+            for (int j = 1; j < Model.TOT_BLOCK_CNT_Y - 1; ++j)
+            {
+                for (int i = 1; i < Model.TOT_BLOCK_CNT_X - 1; ++i)
+                {
+                    randomizedBlocks[cnt].ChangePos(i,j);
+                    ++cnt;
+                }
+            }
+            // Deserialize
+            _deserialize(randomizedBlocks);
         }
 
         /// <summary>
