@@ -26,6 +26,7 @@ namespace LianLianXuan_Prj.Model
         };
 
         // Members
+        private BGMPlayer _bgmPlayer;
         private Grid _grid; // The whole grid
         private Tuple _tuple; // The selected blocks' position (only 2 blocks)
         private GameState _gameState;
@@ -37,10 +38,12 @@ namespace LianLianXuan_Prj.Model
         {
             // Init.
             _gameState = GameState.START;
+            _bgmPlayer = new BGMPlayer();
             _grid = new Grid();
             _tuple = new Tuple(_grid);
 
             _gameState = GameState.PLAYING;
+            _bgmPlayer.Play();
 
             // Test();
         }
@@ -225,11 +228,11 @@ namespace LianLianXuan_Prj.Model
             {
                 Position startPos = _tuple.GetFirst();
                 Position endPos = _tuple.GetSecond();
+                _tuple.Clear(); // Clear tuple
+
                 if (_isConnected(startPos, endPos, _grid))
                 {
                     // Connected, need to be merged
-                    _tuple.Clear(); // Clear tuple
-
                     _grid.GetBlock(startPos).ToNullBlock();
                     _grid.GetBlock(endPos).ToNullBlock();
 
@@ -237,6 +240,22 @@ namespace LianLianXuan_Prj.Model
                     _gameEnd();
                 }
             }
+        }
+
+        /// <summary>
+        /// Flip BGM Player
+        /// </summary>
+        public void FlipBGMPlayer()
+        {
+            _bgmPlayer.Flip();
+        }
+
+        /// <summary>
+        /// Randomize all blocks
+        /// </summary>
+        public void RandonmizeAllBlocks()
+        {
+            _grid.Randomize();
         }
     }
 }

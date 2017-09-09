@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using LianLianXuan_Prj.View;
 
@@ -41,7 +35,6 @@ namespace LianLianXuan_Prj
 
             // Set Timer
             ViewUpdateTimer.Interval = 1000 / FPS;
-
         }
 
         private void GameStage_Load(object sender, EventArgs e)
@@ -67,9 +60,11 @@ namespace LianLianXuan_Prj
             {
                 _mainController.MouseClick(e.X, e.Y, false);
             }
-            
         }
 
-        
+        private void GameStage_KeyUp(object sender, KeyEventArgs e)
+        {
+            _mainController.KeyUp(e.KeyCode);
+        }
     }
 }

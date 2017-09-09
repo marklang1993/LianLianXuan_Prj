@@ -51,6 +51,7 @@
     <Compile Include="GameStage.Designer.cs">
       <DependentUpon>GameStage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\BGMPlayer.cs" />
     <Compile Include="Model\Block.cs" />
     <Compile Include="Model\Grid.cs" />
     <Compile Include="Model\Model.cs" />
