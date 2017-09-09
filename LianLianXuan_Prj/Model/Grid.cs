@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LianLianXuan_Prj.Model
 {
@@ -91,6 +88,7 @@ namespace LianLianXuan_Prj.Model
             // Randomize
             Block[] randomizedBlocks = new Block[Model.GRID_BLOCK_CNT_X * Model.GRID_BLOCK_CNT_Y];
             Random prng = new Random(10);
+            // Random prng = new Random();
             int cnt = 0;
             while (serializedBlocks.Count != 0)
             {
@@ -132,6 +130,5 @@ namespace LianLianXuan_Prj.Model
             if (!Position.IsValid(pos.X, pos.Y)) return null;
             return _map[pos.X][pos.Y];
         }
-    
     }
 }

@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controller\Controller.cs" />
     <Compile Include="GameStage.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -55,6 +56,7 @@
     <Compile Include="Model\Model.cs" />
     <Compile Include="Model\Position.cs" />
     <Compile Include="Model\PriorityQueue.cs" />
+    <Compile Include="Model\Tuple.cs" />
     <Compile Include="View\MainView.cs" />
     <Compile Include="View\View.cs" />
     <Compile Include="Program.cs" />

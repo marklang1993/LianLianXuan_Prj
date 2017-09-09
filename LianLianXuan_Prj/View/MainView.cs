@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Text;
 using LianLianXuan_Prj.Model;
+using Tuple = LianLianXuan_Prj.Model.Tuple;
 
 namespace LianLianXuan_Prj.View
 {
@@ -9,6 +10,8 @@ namespace LianLianXuan_Prj.View
     {
         private readonly Bitmap[] _blockImages; // block images
         private Model.Model _model; // model
+
+        private const int BOARDER_STROKE_SIZE = 3; // boarder stroke size in pixel
 
         /// <summary>
         /// Constructor
@@ -53,16 +56,41 @@ namespace LianLianXuan_Prj.View
             g.DrawImage(_blockImages[imageID], rect);
         }
 
+        private void _paintBoarder(Graphics g, int x, int y)
+        {
+            // ZERO is illegal coordinates
+            if (x == 0 || y == 0)
+            {
+                Console.WriteLine("X = 0 OR Y = 0!");
+                return;
+            }
+
+            // Paint boarder
+            int xPixel = x * (Model.Model.BLOCK_MARGIN + Model.Model.BLOCK_SIZE_X) - BOARDER_STROKE_SIZE;
+            int yPixel = y * (Model.Model.BLOCK_MARGIN + Model.Model.BLOCK_SIZE_Y) - BOARDER_STROKE_SIZE;
+            int width = Model.Model.BLOCK_SIZE_X + BOARDER_STROKE_SIZE;
+            int height = Model.Model.BLOCK_SIZE_Y + BOARDER_STROKE_SIZE;
+            g.DrawRectangle(new Pen(Color.GreenYellow, BOARDER_STROKE_SIZE), xPixel, yPixel, width, height);
+        }
+
         public override void Paint(Graphics g)
         {
-            Block[][] _map = _model.GetMap();
+            // Paint all blocks
+            Block[][] map = _model.GetMap();
             for (int i = 1; i <= 10; ++i)
             {
                 for (int j = 1; j <= 8; ++j)
                 {
-                    _paintBlock(g, i, j, _map[i][j].GetImageId());
+                    _paintBlock(g, i, j, map[i][j].GetImageId());
                 }
             }
+
+            // Paint boarder of selected blocks
+            Tuple tuple = _model.GetSelectedBlocksTuple();
+            Position firstPos = tuple.GetFirst();
+            Position secondPos = tuple.GetSecond();
+            if (firstPos != null) _paintBoarder(g, firstPos.X, firstPos.Y);
+            if (secondPos != null) _paintBoarder(g, secondPos.X, secondPos.Y);
         }
     }
 }

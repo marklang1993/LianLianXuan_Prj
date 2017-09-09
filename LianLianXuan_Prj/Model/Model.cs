@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace LianLianXuan_Prj.Model
 {
@@ -19,17 +16,33 @@ namespace LianLianXuan_Prj.Model
         public const int BLOCK_MARGIN = 10; // Margin size
         public const int IMAGES_CNT = 40; // Count of images
 
+        // Define GameState
+        private enum GameState
+        {
+            START,
+            PLAYING,
+            PAUSE,
+            END
+        };
+
         // Members
-        private Grid _grid;
+        private Grid _grid; // The whole grid
+        private Tuple _tuple; // The selected blocks' position (only 2 blocks)
+        private GameState _gameState;
 
         /// <summary>
         /// Constructor
         /// </summary>
         public Model()
         {
+            // Init.
+            _gameState = GameState.START;
             _grid = new Grid();
+            _tuple = new Tuple(_grid);
 
-            Test();
+            _gameState = GameState.PLAYING;
+
+            // Test();
         }
 
         /// <summary>
@@ -148,6 +161,24 @@ namespace LianLianXuan_Prj.Model
             }
         }
 
+        private void _gameEnd()
+        {
+            
+        }
+
+        /// <summary>
+        /// For DEBUG use only
+        /// </summary>
+        public void Test()
+        {
+            // Must set PRNG in grid by using seed = 10
+            Console.WriteLine(_isConnected(new Position(1, 1), new Position(10, 1), _grid));
+            Console.WriteLine(_isConnected(new Position(1, 7), new Position(2, 8), _grid));
+            Console.WriteLine(_isConnected(new Position(6, 4), new Position(8, 4), _grid));
+            Console.WriteLine(_isConnected(new Position(1, 1), new Position(9, 1), _grid));
+            Console.WriteLine(_isConnected(new Position(8, 2), new Position(10, 2), _grid));
+        }
+
         /// <summary>
         /// Get Map
         /// </summary>
@@ -157,14 +188,55 @@ namespace LianLianXuan_Prj.Model
             return _grid.GetMap();
         }
 
-        public void Test()
+        /// <summary>
+        /// Get tuple with selected blocks
+        /// </summary>
+        /// <returns></returns>
+        public Tuple GetSelectedBlocksTuple()
         {
-            // Must set PRNG in grid by using seed = 10
-            Console.WriteLine(_isConnected(new Position(1, 1), new Position(10, 1), _grid));
-            Console.WriteLine(_isConnected(new Position(1, 7), new Position(2, 8), _grid));
-            Console.WriteLine(_isConnected(new Position(6, 4), new Position(8, 4), _grid));
-            Console.WriteLine(_isConnected(new Position(1, 1), new Position(9, 1), _grid));
-            Console.WriteLine(_isConnected(new Position(8, 2), new Position(10, 2), _grid));
+            return _tuple;
+        }
+
+        /// <summary>
+        /// Mouse Right Click Handler
+        /// </summary>
+        /// <param name="xMouse"></param>
+        /// <param name="yMouse"></param>
+        public void RightClickHandler(int xMouse, int yMouse)
+        {
+            _tuple.Clear();
+        }
+
+        /// <summary>
+        /// Mouse Left Click Handler
+        /// </summary>
+        /// <param name="xMouse"></param>
+        /// <param name="yMouse"></param>
+        public void LeftClickHandler(int xMouse, int yMouse)
+        {
+            // Select a block
+            int x = xMouse / (Model.BLOCK_SIZE_X + Model.BLOCK_MARGIN);
+            int y = yMouse / (Model.BLOCK_SIZE_Y + Model.BLOCK_MARGIN);
+            Position blockPosition = new Position(x, y);
+            if (!_tuple.Select(blockPosition)) return;
+
+            // Check is connected AND required to merge
+            if (_tuple.IsTuple())
+            {
+                Position startPos = _tuple.GetFirst();
+                Position endPos = _tuple.GetSecond();
+                if (_isConnected(startPos, endPos, _grid))
+                {
+                    // Connected, need to be merged
+                    _tuple.Clear(); // Clear tuple
+
+                    _grid.GetBlock(startPos).ToNullBlock();
+                    _grid.GetBlock(endPos).ToNullBlock();
+
+                    // Goto check game end
+                    _gameEnd();
+                }
+            }
         }
     }
 }

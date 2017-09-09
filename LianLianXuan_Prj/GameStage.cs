@@ -17,22 +17,14 @@ namespace LianLianXuan_Prj
 
         private View.ViewManager _viewManager;
         private Model.Model _mainModel;
-
-        // Define GameState
-        private enum GameState
-        {
-            START,
-            PLAYING,
-            PAUSE,
-            END
-        };
-        private GameState _gameState;
+        private Controller.Controller _mainController;
 
         public GameStage()
         {
             InitializeComponent();
 
             // Init. all data members
+            // 1. View
             int wigetWidth = (Model.Model.TOT_BLOCK_CNT_X - 1)*Model.Model.BLOCK_MARGIN
                              + Model.Model.TOT_BLOCK_CNT_X * Model.Model.BLOCK_SIZE_X;
             int wigetHeight = (Model.Model.TOT_BLOCK_CNT_Y - 1) * Model.Model.BLOCK_MARGIN
@@ -40,10 +32,13 @@ namespace LianLianXuan_Prj
             this.Size = new Size(wigetWidth, wigetHeight); // Reset size of the main form
             Rectangle wigetSize = new Rectangle(0, 0, wigetWidth, wigetHeight);
             _viewManager = new ViewManager(this.CreateGraphics(), wigetSize);
-            // Init.Model
+            // 2. Model
             _mainModel = new Model.Model();
-            // Bind all Views
+            // - Bind all Views
             _viewManager.Bind(new MainView(_mainModel));
+            // 3. Controller
+            _mainController = new Controller.Controller(_mainModel);
+
             // Set Timer
             ViewUpdateTimer.Interval = 1000 / FPS;
 
@@ -59,6 +54,20 @@ namespace LianLianXuan_Prj
         {
             // Update View
             _viewManager.Update();
+        }
+
+        private void GameStage_MouseClick(object sender, MouseEventArgs e)
+        {
+            // Mouse Click
+            if (e.Button == MouseButtons.Right)
+            {
+                _mainController.MouseClick(e.X, e.Y, true);
+            }
+            else if (e.Button == MouseButtons.Left)
+            {
+                _mainController.MouseClick(e.X, e.Y, false);
+            }
+            
         }
 
         
