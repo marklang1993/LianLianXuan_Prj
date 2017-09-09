@@ -27,6 +27,7 @@ namespace LianLianXuan_Prj.Model
 
         // Members
         private BGMPlayer _bgmPlayer;
+        private SEPlayer _sePlayer;
         private Grid _grid; // The whole grid
         private Tuple _tuple; // The selected blocks' position (only 2 blocks)
         private GameState _gameState;
@@ -39,6 +40,7 @@ namespace LianLianXuan_Prj.Model
             // Init.
             _gameState = GameState.START;
             _bgmPlayer = new BGMPlayer();
+            _sePlayer = new SEPlayer();
             _grid = new Grid();
             _tuple = new Tuple(_grid);
 
@@ -226,6 +228,8 @@ namespace LianLianXuan_Prj.Model
         public void RightClickHandler(int xMouse, int yMouse)
         {
             _tuple.Clear();
+
+            _sePlayer.Cancel(); // Cancel SE
         }
 
         /// <summary>
@@ -253,10 +257,19 @@ namespace LianLianXuan_Prj.Model
                     // Connected, need to be merged
                     _grid.GetBlock(startPos).ToNullBlock();
                     _grid.GetBlock(endPos).ToNullBlock();
+                    _sePlayer.Merged(); // Merged SE
 
                     // Goto check game end
                     _gameEnd();
                 }
+                else
+                {
+                    _sePlayer.Failed(); // Failed SE
+                }
+            }
+            else
+            {
+                _sePlayer.Clicked(); // Click SE
             }
         }
 
@@ -274,6 +287,8 @@ namespace LianLianXuan_Prj.Model
         public void RandonmizeAllBlocks()
         {
             _grid.Randomize();
+
+            _sePlayer.Refresh(); // Refresh SE
         }
 
         public void RestartGame()

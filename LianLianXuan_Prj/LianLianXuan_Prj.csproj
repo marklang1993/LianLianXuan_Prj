@@ -57,6 +57,7 @@
     <Compile Include="Model\Model.cs" />
     <Compile Include="Model\Position.cs" />
     <Compile Include="Model\PriorityQueue.cs" />
+    <Compile Include="Model\SEPlayer.cs" />
     <Compile Include="Model\Tuple.cs" />
     <Compile Include="View\GameEndView.cs" />
     <Compile Include="View\MainView.cs" />
