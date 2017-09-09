@@ -32,49 +32,83 @@ namespace LianLianXuan_Prj.Model
             Test();
         }
 
-        private void ExpandBFS(Queue<Position> searchQueue, Position curPos, Grid _grid)
+        /// <summary>
+        /// Calculate Manhattan Heuristic
+        /// </summary>
+        /// <param name="curPos">Current position</param>
+        /// <param name="goalPos">Goal position</param>
+        /// <returns></returns>
+        private int _getHeuristic(Position curPos, Position goalPos)
         {
-            Block temp;
-            // Up
-            temp = _grid.GetBlock(curPos.Up());
-            if (temp != null) // If such block does not exist due to the invalid coordinates
+            // Manhattan Heuristic
+            int xDis = Math.Abs(goalPos.X - curPos.X);
+            int yDis = Math.Abs(goalPos.Y - curPos.Y);
+
+            return xDis + yDis;
+        }
+
+        /// <summary>
+        /// Calculate Expected Cost as Priority
+        /// </summary>
+        /// <param name="curPos">Current position</param>
+        /// <param name="goalPos">Goal position</param>
+        /// <param name="curCost">Current cost from start point</param>
+        /// <returns></returns>
+        private int _calculateExpectCost(Position curPos, Position goalPos, int curCost)
+        {
+            return _getHeuristic(curPos, goalPos) + curCost;
+        }
+
+        /// <summary>
+        /// Expand nodes by BFS in single direction
+        /// </summary>
+        /// <param name="searchQueue">Searching queue</param>
+        /// <param name="newBlock">Block in new position</param>
+        /// <param name="goalPos">Goal position</param>
+        /// <param name="curCost">Current cost from start point</param>
+        /// <param name="grid">Grid</param>
+        private void _expandSingle(PriorityQueue searchQueue, Block newBlock, Position goalPos, int curCost, Grid grid)
+        {
+            if (newBlock != null) // If such block does not exist due to the invalid coordinates
             {
-                if (temp.IsNull())
+                Position newPos = newBlock.GetPos();
+                if (newBlock.IsNull())
                 {
                     // Empty Block, able to pass
-                    searchQueue.Enqueue(temp.GetPos());
+                    searchQueue.Enqueue(_calculateExpectCost(newBlock.GetPos(), goalPos, curCost), newPos);
                 }
             }
-            // Down
-            temp = _grid.GetBlock(curPos.Down());
-            if (temp != null) // If such block does not exist due to the invalid coordinates
-            {
-                if (temp.IsNull())
-                {
-                    // Empty Block, able to pass
-                    searchQueue.Enqueue(temp.GetPos());
-                }
-            }
-            // Left
-            temp = _grid.GetBlock(curPos.Left());
-            if (temp != null) // If such block does not exist due to the invalid coordinates
-            {
-                if (temp.IsNull())
-                {
-                    // Empty Block, able to pass
-                    searchQueue.Enqueue(temp.GetPos());
-                }
-            }
-            // Right
-            temp = _grid.GetBlock(curPos.Right());
-            if (temp != null) // If such block does not exist due to the invalid coordinates
-            {
-                if (temp.IsNull())
-                {
-                    // Empty Block, able to pass
-                    searchQueue.Enqueue(temp.GetPos());
-                }
-            }
+        }
+
+        /// <summary>
+        /// Expand nodes by BFS
+        /// </summary>
+        /// <param name="searchQueue">Searching queue</param>
+        /// <param name="curPos">Current position</param>
+        /// <param name="goalPos">Goal position</param>
+        /// <param name="curCost">Current cost from start point</param>
+        /// <param name="grid">Grid</param>
+        private void _expandBFS(PriorityQueue searchQueue, Position curPos, Position goalPos, int curCost, Grid grid)
+        {
+            _expandSingle(searchQueue, grid.GetBlock(curPos.Up()), goalPos, curCost, grid);
+            _expandSingle(searchQueue, grid.GetBlock(curPos.Down()), goalPos, curCost, grid);
+            _expandSingle(searchQueue, grid.GetBlock(curPos.Left()), goalPos, curCost, grid);
+            _expandSingle(searchQueue, grid.GetBlock(curPos.Right()), goalPos, curCost, grid);
+        }
+
+        /// <summary>
+        /// Determine finding path is finished
+        /// </summary>
+        /// <param name="curPos">Current position</param>
+        /// <param name="goalPos">Goal position</param>
+        /// <returns></returns>
+        private bool _isArrived(Position curPos, Position goalPos)
+        {
+            if (curPos.Up().IsEqual(goalPos)) return true;
+            if (curPos.Down().IsEqual(goalPos)) return true;
+            if (curPos.Left().IsEqual(goalPos)) return true;
+            if (curPos.Right().IsEqual(goalPos)) return true;
+            return false;
         }
 
         /// <summary>
@@ -82,13 +116,13 @@ namespace LianLianXuan_Prj.Model
         /// </summary>
         /// <param name="startPos">Start block position</param>
         /// <param name="endPos">End block position</param>
-        /// <param name="_grid">Grid</param>
+        /// <param name="grid">Grid</param>
         /// <returns></returns>
-        private bool _isConnected(Position startPos, Position endPos, Grid _grid)
+        private bool _isConnected(Position startPos, Position endPos, Grid grid)
         {
             // Get blocks tuple
-            Block start = _grid.GetBlock(startPos);
-            Block end = _grid.GetBlock(endPos);
+            Block start = grid.GetBlock(startPos);
+            Block end = grid.GetBlock(endPos);
 
             // Check prerequisites: valid positions, valid blocks, same type and blocks in different positions
             if (start == null || end == null) return false;
@@ -97,17 +131,20 @@ namespace LianLianXuan_Prj.Model
             if (start.GetPos().IsEqual(end.GetPos())) return false;
 
             // Find path by BFS
-            Queue<Position> searchQueue = new Queue<Position>();
-            searchQueue.Enqueue(start.GetPos());
+            PriorityQueue searchQueue = new PriorityQueue();
+            int currentCost = 0;
+            searchQueue.Enqueue(_calculateExpectCost(startPos, endPos, currentCost), start.GetPos());
             while (true)
             {
                 // failed
-                if (searchQueue.Count == 0) return false;
+                if (searchQueue.IsEmpty()) return false;
                 // found
                 Position curPos = searchQueue.Dequeue();
-                if (curPos.IsEqual(end.GetPos())) return true;
+                if (_isArrived(curPos, end.GetPos())) return true;
+                // inc. current cost
+                ++currentCost;
                 // expand
-                ExpandBFS(searchQueue, curPos, _grid);
+                _expandBFS(searchQueue, curPos, endPos, currentCost, grid);
             }
         }
 
@@ -122,7 +159,10 @@ namespace LianLianXuan_Prj.Model
 
         public void Test()
         {
+            // Must set PRNG in grid by using seed = 10
             Console.WriteLine(_isConnected(new Position(1, 1), new Position(10, 1), _grid));
+            Console.WriteLine(_isConnected(new Position(1, 7), new Position(2, 8), _grid));
+            Console.WriteLine(_isConnected(new Position(6, 4), new Position(8, 4), _grid));
             Console.WriteLine(_isConnected(new Position(1, 1), new Position(9, 1), _grid));
             Console.WriteLine(_isConnected(new Position(8, 2), new Position(10, 2), _grid));
         }
