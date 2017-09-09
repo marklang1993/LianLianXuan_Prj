@@ -5,10 +5,12 @@ namespace LianLianXuan_Prj.Model
     public class PriorityQueue
     {
         private readonly SortedList<int, Queue<Position>> _priorityList;
+        private int _count;
 
         public PriorityQueue()
         {
             _priorityList = new SortedList<int, Queue<Position>>();
+            _count = 0;
         }
 
         public void Enqueue(int priority, Position pos)
@@ -26,7 +28,7 @@ namespace LianLianXuan_Prj.Model
                 queue.Enqueue(pos);
                 _priorityList.Add(priority, queue);
             }
-
+            ++_count;
         }
 
         public Position Dequeue()
@@ -45,6 +47,7 @@ namespace LianLianXuan_Prj.Model
                 {
                     _priorityList.Remove(priority);
                 }
+                --_count;
                 return pos;
             }
             // Element does not exist
@@ -54,6 +57,11 @@ namespace LianLianXuan_Prj.Model
         public bool IsEmpty()
         {
             return _priorityList.Count == 0;
+        }
+
+        public int Count()
+        {
+            return _count;
         }
     }
 }

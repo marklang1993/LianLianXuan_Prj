@@ -17,7 +17,7 @@ namespace LianLianXuan_Prj.Model
         public const int IMAGES_CNT = 40; // Count of images
 
         // Define GameState
-        private enum GameState
+        public enum GameState
         {
             START,
             PLAYING,
@@ -154,6 +154,7 @@ namespace LianLianXuan_Prj.Model
             {
                 // failed
                 if (searchQueue.IsEmpty()) return false;
+                if (searchQueue.Count() > 500) return false;
                 // found
                 Position curPos = searchQueue.Dequeue();
                 if (_isArrived(curPos, end.GetPos())) return true;
@@ -164,9 +165,17 @@ namespace LianLianXuan_Prj.Model
             }
         }
 
+        /// <summary>
+        /// Game End Related Processing
+        /// </summary>
         private void _gameEnd()
         {
-            
+            // Check
+            if (_grid.IsAllInvalid())
+            {
+                // Game is end
+                _gameState = GameState.END;
+            }
         }
 
         /// <summary>
@@ -198,6 +207,15 @@ namespace LianLianXuan_Prj.Model
         public Tuple GetSelectedBlocksTuple()
         {
             return _tuple;
+        }
+
+        /// <summary>
+        /// Get Current Game State
+        /// </summary>
+        /// <returns></returns>
+        public GameState GetState()
+        {
+            return _gameState;;
         }
 
         /// <summary>
@@ -256,6 +274,14 @@ namespace LianLianXuan_Prj.Model
         public void RandonmizeAllBlocks()
         {
             _grid.Randomize();
+        }
+
+        public void RestartGame()
+        {
+            // Restart Game
+            _grid.Reset();
+            _tuple.Clear();
+            _gameState = GameState.PLAYING;
         }
     }
 }

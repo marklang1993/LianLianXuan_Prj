@@ -10,30 +10,7 @@ namespace LianLianXuan_Prj.Model
 
         public Grid()
         {
-            // Init. map
-            _map = new Block[Model.TOT_BLOCK_CNT_X][];
-            for (int i = 0; i < Model.TOT_BLOCK_CNT_X; ++i)
-            {
-                _map[i] = new Block[Model.TOT_BLOCK_CNT_Y];
-            }
-            // Init. all blocks to null blocks
-            for (int j = 0; j < Model.TOT_BLOCK_CNT_Y; ++j)
-            {
-                for (int i = 0; i < Model.TOT_BLOCK_CNT_X; ++i)
-                {
-                    _map[i][j] = new Block(i, j, Block.NULL_TYPE);
-                }
-            }
-
-            // Init. all blocks in play area to valid blocks
-            Block[] serializedBlocks = _serialize();
-            for (int i = 0; i < Model.GRID_BLOCK_CNT_X*Model.GRID_BLOCK_CNT_Y; ++i)
-            {
-                serializedBlocks[i].ToValidBlock(i / 2);
-            }
-            _deserialize(serializedBlocks);
-            // Randomize
-            Randomize();
+            Reset();
         }
 
         /// <summary>
@@ -78,6 +55,37 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
+        /// Reset Grid
+        /// </summary>
+        public void Reset()
+        {
+            // Init. map
+            _map = new Block[Model.TOT_BLOCK_CNT_X][];
+            for (int i = 0; i < Model.TOT_BLOCK_CNT_X; ++i)
+            {
+                _map[i] = new Block[Model.TOT_BLOCK_CNT_Y];
+            }
+            // Init. all blocks to null blocks
+            for (int j = 0; j < Model.TOT_BLOCK_CNT_Y; ++j)
+            {
+                for (int i = 0; i < Model.TOT_BLOCK_CNT_X; ++i)
+                {
+                    _map[i][j] = new Block(i, j, Block.NULL_TYPE);
+                }
+            }
+
+            // Init. all blocks in play area to valid blocks
+            Block[] serializedBlocks = _serialize();
+            for (int i = 0; i < Model.GRID_BLOCK_CNT_X * Model.GRID_BLOCK_CNT_Y; ++i)
+            {
+                serializedBlocks[i].ToValidBlock(i / 2);
+            }
+            _deserialize(serializedBlocks);
+            // Randomize
+            Randomize();
+        }
+
+        /// <summary>
         /// Randomize all blocks in play area
         /// </summary>
         public void Randomize()
@@ -87,8 +95,8 @@ namespace LianLianXuan_Prj.Model
             serializedBlocks.AddRange(_serialize());
             // Randomize
             Block[] randomizedBlocks = new Block[Model.GRID_BLOCK_CNT_X * Model.GRID_BLOCK_CNT_Y];
-            Random prng = new Random(10);
-            // Random prng = new Random();
+            //Random prng = new Random(10);
+            Random prng = new Random();
             int cnt = 0;
             while (serializedBlocks.Count != 0)
             {
@@ -109,6 +117,25 @@ namespace LianLianXuan_Prj.Model
             }
             // Deserialize
             _deserialize(randomizedBlocks);
+        }
+
+        /// <summary>
+        /// Check all blocks in play areas are invalid
+        /// </summary>
+        /// <returns></returns>
+        public bool IsAllInvalid()
+        {
+            bool ret = true;
+
+            for (int j = 1; j < Model.TOT_BLOCK_CNT_Y - 1; ++j)
+            {
+                for (int i = 1; i < Model.TOT_BLOCK_CNT_X - 1; ++i)
+                {
+                    ret = ret && _map[i][j].IsNull();
+                }
+            }
+
+            return ret;
         }
 
         /// <summary>

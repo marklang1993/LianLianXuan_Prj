@@ -75,22 +75,26 @@ namespace LianLianXuan_Prj.View
 
         public override void Paint(Graphics g)
         {
-            // Paint all blocks
-            Block[][] map = _model.GetMap();
-            for (int i = 1; i <= 10; ++i)
+            // Determine the game state
+            if (_model.GetState() == Model.Model.GameState.PLAYING)
             {
-                for (int j = 1; j <= 8; ++j)
+                // Paint all blocks
+                Block[][] map = _model.GetMap();
+                for (int i = 1; i <= 10; ++i)
                 {
-                    _paintBlock(g, i, j, map[i][j].GetImageId());
+                    for (int j = 1; j <= 8; ++j)
+                    {
+                        _paintBlock(g, i, j, map[i][j].GetImageId());
+                    }
                 }
-            }
 
-            // Paint boarder of selected blocks
-            Tuple tuple = _model.GetSelectedBlocksTuple();
-            Position firstPos = tuple.GetFirst();
-            Position secondPos = tuple.GetSecond();
-            if (firstPos != null) _paintBoarder(g, firstPos.X, firstPos.Y);
-            if (secondPos != null) _paintBoarder(g, secondPos.X, secondPos.Y);
+                // Paint boarder of selected blocks
+                Tuple tuple = _model.GetSelectedBlocksTuple();
+                Position firstPos = tuple.GetFirst();
+                Position secondPos = tuple.GetSecond();
+                if (firstPos != null) _paintBoarder(g, firstPos.X, firstPos.Y);
+                if (secondPos != null) _paintBoarder(g, secondPos.X, secondPos.Y);
+            }
         }
     }
 }

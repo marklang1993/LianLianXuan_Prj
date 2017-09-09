@@ -47,6 +47,14 @@ namespace LianLianXuan_Prj.Controller
                 // Randomize all blocks
                 _model.RandonmizeAllBlocks();
             }
+            else if (key == Keys.Y)
+            {
+                if (_model.GetState() == Model.Model.GameState.END)
+                {
+                    // Restart Game
+                    _model.RestartGame();
+                }
+            }
             
         }
     }

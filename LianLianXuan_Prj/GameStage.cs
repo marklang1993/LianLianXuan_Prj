@@ -30,6 +30,7 @@ namespace LianLianXuan_Prj
             _mainModel = new Model.Model();
             // - Bind all Views
             _viewManager.Bind(new MainView(_mainModel));
+            _viewManager.Bind(new GameEndView(_mainModel));
             // 3. Controller
             _mainController = new Controller.Controller(_mainModel);
 
