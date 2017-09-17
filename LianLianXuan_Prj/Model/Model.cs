@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace LianLianXuan_Prj.Model
 {
@@ -45,74 +43,11 @@ namespace LianLianXuan_Prj.Model
             _tuple = new Tuple(_grid);
 
             _gameState = GameState.PLAYING;
-            _bgmPlayer.Play();
+            //_bgmPlayer.Play();
 
             // Test();
         }
 
-        /// <summary>
-        /// Calculate Manhattan Heuristic
-        /// </summary>
-        /// <param name="curPos">Current position</param>
-        /// <param name="goalPos">Goal position</param>
-        /// <returns></returns>
-        private int _getHeuristic(Position curPos, Position goalPos)
-        {
-            // Manhattan Heuristic
-            int xDis = Math.Abs(goalPos.X - curPos.X);
-            int yDis = Math.Abs(goalPos.Y - curPos.Y);
-
-            return xDis + yDis;
-        }
-
-        /// <summary>
-        /// Calculate Expected Cost as Priority
-        /// </summary>
-        /// <param name="curPos">Current position</param>
-        /// <param name="goalPos">Goal position</param>
-        /// <param name="curCost">Current cost from start point</param>
-        /// <returns></returns>
-        private int _calculateExpectCost(Position curPos, Position goalPos, int curCost)
-        {
-            return _getHeuristic(curPos, goalPos) + curCost;
-        }
-
-        /// <summary>
-        /// Expand nodes by BFS in single direction
-        /// </summary>
-        /// <param name="searchQueue">Searching queue</param>
-        /// <param name="newBlock">Block in new position</param>
-        /// <param name="goalPos">Goal position</param>
-        /// <param name="curCost">Current cost from start point</param>
-        /// <param name="grid">Grid</param>
-        private void _expandSingle(PriorityQueue searchQueue, Block newBlock, Position goalPos, int curCost, Grid grid)
-        {
-            if (newBlock != null) // If such block does not exist due to the invalid coordinates
-            {
-                Position newPos = newBlock.GetPos();
-                if (newBlock.IsNull())
-                {
-                    // Empty Block, able to pass
-                    searchQueue.Enqueue(_calculateExpectCost(newBlock.GetPos(), goalPos, curCost), newPos);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Expand nodes by BFS
-        /// </summary>
-        /// <param name="searchQueue">Searching queue</param>
-        /// <param name="curPos">Current position</param>
-        /// <param name="goalPos">Goal position</param>
-        /// <param name="curCost">Current cost from start point</param>
-        /// <param name="grid">Grid</param>
-        private void _expandBFS(PriorityQueue searchQueue, Position curPos, Position goalPos, int curCost, Grid grid)
-        {
-            _expandSingle(searchQueue, grid.GetBlock(curPos.Up()), goalPos, curCost, grid);
-            _expandSingle(searchQueue, grid.GetBlock(curPos.Down()), goalPos, curCost, grid);
-            _expandSingle(searchQueue, grid.GetBlock(curPos.Left()), goalPos, curCost, grid);
-            _expandSingle(searchQueue, grid.GetBlock(curPos.Right()), goalPos, curCost, grid);
-        }
 
         /// <summary>
         /// Determine finding path is finished
@@ -127,6 +62,154 @@ namespace LianLianXuan_Prj.Model
             if (curPos.Left().IsEqual(goalPos)) return true;
             if (curPos.Right().IsEqual(goalPos)) return true;
             return false;
+        }
+
+        /// <summary>
+        /// Get binary tuple of start and end positions given current position by expanding horizontally
+        /// </summary>
+        /// <param name="curPos">Current position</param>
+        /// <param name="grid">Grid</param>
+        /// <param name="curType">Current block type</param>
+        /// <returns></returns>
+        private Tuple _expandHorizontal(Position curPos, Grid grid, int curType)
+        {
+            int startPos, endPos;
+            int i, j;
+            j = curPos.Y;
+            Tuple tuple = new Tuple(grid);
+
+            // From current to leftmost
+            startPos = curPos.X;
+            i = startPos - 1;
+            while (i >= 0)
+            {
+                Block curExploredBlock = grid.GetBlock(new Position(i, j));
+                if (curExploredBlock.IsNull())
+                {
+                    // Null block can be passed
+                    startPos = i;
+                }
+                else if (curExploredBlock.GetImageId() == curType)
+                {
+                    // Block with same type can be passed
+                    startPos = i;
+
+                }
+                else
+                {
+                    // Cannot passed, terminated
+                    break;
+                }
+                --i;
+            }
+
+            // From current to rightmost
+            endPos = curPos.X;
+            i = endPos + 1;
+            while (i < Model.TOT_BLOCK_CNT_X)
+            {
+                Block curExploredBlock = grid.GetBlock(new Position(i, j));
+                if (curExploredBlock.IsNull())
+                {
+                    // Null block can be passed
+                    endPos = i;
+                }
+                else if (curExploredBlock.GetImageId() == curType)
+                {
+                    // Block with same type can be passed
+                    endPos = i;
+
+                }
+                else
+                {
+                    // Cannot passed, terminated
+                    break;
+                }
+                ++i;
+            }
+
+            bool ret = true;
+            ret = ret && tuple.Select(new Position(startPos, j));
+            ret = ret && tuple.Select(new Position(endPos, j));
+            if (!ret)
+            {
+                throw new Exception();
+            }
+            return tuple;
+        }
+
+        /// <summary>
+        /// Get binary tuple of start and end positions given current position by expanding vertically
+        /// </summary>
+        /// <param name="curPos">Current position</param>
+        /// <param name="grid">Grid</param>
+        /// <param name="curType">Current block type</param>
+        /// <returns></returns>
+        private Tuple _expandVertical(Position curPos, Grid grid, int curType)
+        {
+            int startPos, endPos;
+            int i, j;
+            i = curPos.X;
+            Tuple tuple = new Tuple(grid);
+
+            // From current to upmost
+            startPos = curPos.Y;
+            j = startPos - 1;
+            while (j >= 0)
+            {
+                Block curExploredBlock = grid.GetBlock(new Position(i, j));
+                if (curExploredBlock.IsNull())
+                {
+                    // Null block can be passed
+                    startPos = j;
+                }
+                else if (curExploredBlock.GetImageId() == curType)
+                {
+                    // Block with same type can be passed
+                    startPos = j;
+
+                }
+                else
+                {
+                    // Cannot passed, terminated
+                    break;
+                }
+                --j;
+            }
+
+            // From current to downmost
+            endPos = curPos.Y;
+            j = endPos + 1;
+            while (j < Model.TOT_BLOCK_CNT_Y)
+            {
+                Block curExploredBlock = grid.GetBlock(new Position(i, j));
+                if (curExploredBlock.IsNull())
+                {
+                    // Null block can be passed
+                    endPos = j;
+                }
+                else if (curExploredBlock.GetImageId() == curType)
+                {
+                    // Block with same type can be passed
+                    endPos = j;
+
+                }
+                else
+                {
+                    // Cannot passed, terminated
+                    break;
+                }
+                ++j;
+            }
+
+            bool ret = true;
+            ret = ret && tuple.Select(new Position(i, startPos));
+            ret = ret && tuple.Select(new Position(i, endPos));
+            if (!ret)
+            {
+                throw new Exception();
+            }
+            return tuple;
         }
 
         /// <summary>
@@ -148,7 +231,16 @@ namespace LianLianXuan_Prj.Model
             if (!Block.TypeEqual(start, end)) return false;
             if (start.GetPos().IsEqual(end.GetPos())) return false;
 
-            // Find path by BFS
+            // Expand vertically and horizontally
+            Tuple hStartTuple = _expandHorizontal(startPos, grid, start.GetImageId());
+            Tuple vStartTuple = _expandVertical(startPos, grid, start.GetImageId());
+            Tuple hEndTuple = _expandHorizontal(endPos, grid, end.GetImageId());
+            Tuple vEndTuple = _expandVertical(endPos, grid, end.GetImageId());
+
+            
+            return true;
+
+/*            // Find path by BFS
             PriorityQueue searchQueue = new PriorityQueue();
             int currentCost = 0;
             searchQueue.Enqueue(_calculateExpectCost(startPos, endPos, currentCost), start.GetPos());
@@ -164,7 +256,7 @@ namespace LianLianXuan_Prj.Model
                 ++currentCost;
                 // expand
                 _expandBFS(searchQueue, curPos, endPos, currentCost, grid);
-            }
+            }*/
         }
 
         /// <summary>
@@ -217,7 +309,7 @@ namespace LianLianXuan_Prj.Model
         /// <returns></returns>
         public GameState GetState()
         {
-            return _gameState;;
+            return _gameState;
         }
 
         /// <summary>

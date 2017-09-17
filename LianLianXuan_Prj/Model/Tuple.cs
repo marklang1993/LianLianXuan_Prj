@@ -21,8 +21,8 @@ namespace LianLianXuan_Prj.Model
         /// <returns></returns>
         public bool Select(Position pos)
         {
-            // Check selected block is valid
-            if (_grid.GetBlock(pos).IsNull()) return false;
+/*            // Check selected block is valid
+            if (_grid.GetBlock(pos).IsNull()) return false;*/
 
             // Set block
             if (firstBlock == null && secondBlock == null)
@@ -77,6 +77,21 @@ namespace LianLianXuan_Prj.Model
         public Position GetSecond()
         {
             return secondBlock;
+        }
+
+        /// <summary>
+        /// Determine whether the start position is same as end position
+        /// </summary>
+        /// <returns></returns>
+        public bool IsSame()
+        {
+            if (IsTuple())
+            {
+                return firstBlock.IsEqual(secondBlock);
+            }
+
+            // If it is not a valid tuple, return false
+            return false;
         }
     }
 }
