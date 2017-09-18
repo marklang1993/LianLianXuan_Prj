@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing.Text;
 
 namespace LianLianXuan_Prj.Model
 {
@@ -213,6 +214,126 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
+        /// Determine given line is horizontal line or vertical
+        /// </summary>
+        /// <param name="line">Tuple of line</param>
+        /// <returns></returns>
+        private bool _isHorizontal(Tuple line)
+        {
+            Position first = line.GetFirst();
+            Position second = line.GetSecond();
+            if (first.X == second.X)
+            {
+                return false;
+            } 
+            else if (first.Y == second.Y)
+            {
+                return true;
+            }
+            throw new Exception();
+        }
+
+        /// <summary>
+        /// Check intersection between 2 lines
+        /// </summary>
+        /// <param name="lineA">Line A</param>
+        /// <param name="lineB">Line B</param>
+        /// <returns></returns>
+        private bool _isIntersect(Tuple lineA, Tuple lineB)
+        {
+            Position intersection = null;
+            bool isHorizontalLineA = _isHorizontal(lineA);
+            bool isHorizontalLineB = _isHorizontal(lineB);
+            Position startA = lineA.GetFirst();
+            Position endA = lineA.GetSecond();
+            Position startB = lineB.GetFirst();
+            Position endB = lineB.GetSecond();
+            // Validation
+            if (startA.X > endA.X) throw new Exception();
+            if (startA.Y > endA.Y) throw new Exception();
+            if (startB.X > endB.X) throw new Exception();
+            if (startB.Y > endB.Y) throw new Exception();
+
+            if (isHorizontalLineA == isHorizontalLineB)
+            {
+                // Same direction
+                if (isHorizontalLineA)
+                {
+                    // Horizontally - Y is fixed, X is varying
+                    if (startA.Y != startB.Y) return false; // Parallel but not overlap
+                    // On the same line
+                    if (startA.X <= startB.X && endA.X >= startB.X)
+                    {
+                        intersection = new Position(startB.X, startB.Y);
+                        return true;
+                    }
+                    else if (startA.X <= endB.X && endA.X >= endB.X)
+                    {
+                        intersection = new Position(endB.X, endB.Y);
+                        return true;
+                    }
+                    return false;
+                }
+                else
+                {
+                    // Vertically - X is fixed, Y is varying
+                    if (startA.X != startB.X) return false; // Parallel but not overlap
+                    // On the same line
+                    if (startA.Y <= startB.Y && endA.Y >= startB.Y)
+                    {
+                        intersection = new Position(startB.X, startB.Y);
+                        return true;
+                    }
+                    else if (startA.Y <= endB.Y && endA.Y >= endB.Y)
+                    {
+                        intersection = new Position(endB.X, endB.Y);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            else
+            {
+                // Different directions
+                if (isHorizontalLineA == false)
+                {
+                    // Line A is Vertical, Line B is Horizontal
+                    intersection = new Position(startA.X, startB.Y);
+                }
+                else
+                {
+                    // Line A is Horizontal, Line B is Vertical
+                    intersection = new Position(startB.X, startA.Y);
+                }
+                // Check the intersection is on both lines
+                if (!(startA.X <= intersection.X && endA.X >= intersection.X)) return false;
+                if (!(startB.X <= intersection.X && endB.X >= intersection.X)) return false;
+                if (!(startA.Y <= intersection.Y && endA.Y >= intersection.Y)) return false;
+                if (!(startB.Y <= intersection.Y && endB.Y >= intersection.Y)) return false;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Check intersection between 1 line and 1 point
+        /// </summary>
+        /// <param name="line">Line</param>
+        /// <param name="point">Point</param>
+        /// <returns></returns>
+        private bool _isIntersect(Tuple line, Position point)
+        {
+            Position start = line.GetFirst();
+            Position end = line.GetSecond();
+            // Validation
+            if (start.X > end.X) throw new Exception();
+            if (start.Y > end.Y) throw new Exception();
+            // Check the point on the line
+            if (!(start.X <= point.X && end.X >= point.X)) return false;
+            if (!(start.Y <= point.Y && end.Y >= point.Y)) return false;
+            return true;
+        }
+
+        /// <summary>
         /// Deterimine two blocks can be connected
         /// </summary>
         /// <param name="startPos">Start block position</param>
@@ -237,26 +358,16 @@ namespace LianLianXuan_Prj.Model
             Tuple hEndTuple = _expandHorizontal(endPos, grid, end.GetImageId());
             Tuple vEndTuple = _expandVertical(endPos, grid, end.GetImageId());
 
+            bool ret = false;
+            // #1 No turing
+            ret = ret || _isIntersect(hStartTuple, hEndTuple);
+            ret = ret || _isIntersect(hStartTuple, hEndTuple);
+            // #2 Turing once
+            ret = ret || _isIntersect(hStartTuple, vEndTuple);
+            ret = ret || _isIntersect(vStartTuple, hEndTuple);
+            // #3 Turing twice
             
-            return true;
-
-/*            // Find path by BFS
-            PriorityQueue searchQueue = new PriorityQueue();
-            int currentCost = 0;
-            searchQueue.Enqueue(_calculateExpectCost(startPos, endPos, currentCost), start.GetPos());
-            while (true)
-            {
-                // failed
-                if (searchQueue.IsEmpty()) return false;
-                if (searchQueue.Count() > 500) return false;
-                // found
-                Position curPos = searchQueue.Dequeue();
-                if (_isArrived(curPos, end.GetPos())) return true;
-                // inc. current cost
-                ++currentCost;
-                // expand
-                _expandBFS(searchQueue, curPos, endPos, currentCost, grid);
-            }*/
+            return ret;
         }
 
         /// <summary>
