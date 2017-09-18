@@ -30,6 +30,8 @@ namespace LianLianXuan_Prj.Model
         private Grid _grid; // The whole grid
         private Tuple _tuple; // The selected blocks' position (only 2 blocks)
         private GameState _gameState;
+        private Score _score;
+
 
         /// <summary>
         /// Constructor
@@ -42,27 +44,12 @@ namespace LianLianXuan_Prj.Model
             _sePlayer = new SEPlayer();
             _grid = new Grid();
             _tuple = new Tuple(_grid);
+            _score = new Score();
 
             _gameState = GameState.PLAYING;
-            //_bgmPlayer.Play();
+            _bgmPlayer.Play();
 
             // Test();
-        }
-
-
-        /// <summary>
-        /// Determine finding path is finished
-        /// </summary>
-        /// <param name="curPos">Current position</param>
-        /// <param name="goalPos">Goal position</param>
-        /// <returns></returns>
-        private bool _isArrived(Position curPos, Position goalPos)
-        {
-            if (curPos.Up().IsEqual(goalPos)) return true;
-            if (curPos.Down().IsEqual(goalPos)) return true;
-            if (curPos.Left().IsEqual(goalPos)) return true;
-            if (curPos.Right().IsEqual(goalPos)) return true;
-            return false;
         }
 
         /// <summary>
@@ -315,25 +302,6 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
-        /// Check intersection between 1 line and 1 point
-        /// </summary>
-        /// <param name="line">Line</param>
-        /// <param name="point">Point</param>
-        /// <returns></returns>
-        private bool _isIntersect(Tuple line, Position point)
-        {
-            Position start = line.GetFirst();
-            Position end = line.GetSecond();
-            // Validation
-            if (start.X > end.X) throw new Exception();
-            if (start.Y > end.Y) throw new Exception();
-            // Check the point on the line
-            if (!(start.X <= point.X && end.X >= point.X)) return false;
-            if (!(start.Y <= point.Y && end.Y >= point.Y)) return false;
-            return true;
-        }
-
-        /// <summary>
         /// Check is there a path by give line segment
         /// </summary>
         /// <param name="line"></param>
@@ -536,6 +504,15 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
+        /// Get total score
+        /// </summary>
+        /// <returns></returns>
+        public int GetTotalScore()
+        {
+            return _score.GetTotalScore();
+        }
+
+        /// <summary>
         /// Get Current Game State
         /// </summary>
         /// <returns></returns>
@@ -551,6 +528,9 @@ namespace LianLianXuan_Prj.Model
         /// <param name="yMouse"></param>
         public void RightClickHandler(int xMouse, int yMouse)
         {
+            // Check the game state
+            if (_gameState != GameState.PLAYING) return;
+
             _tuple.Clear();
 
             _sePlayer.Cancel(); // Cancel SE
@@ -563,6 +543,9 @@ namespace LianLianXuan_Prj.Model
         /// <param name="yMouse"></param>
         public void LeftClickHandler(int xMouse, int yMouse)
         {
+            // Check the game state
+            if (_gameState != GameState.PLAYING) return;
+
             // Select a block
             int x = xMouse / (Model.BLOCK_SIZE_X + Model.BLOCK_MARGIN);
             int y = yMouse / (Model.BLOCK_SIZE_Y + Model.BLOCK_MARGIN);
@@ -581,6 +564,8 @@ namespace LianLianXuan_Prj.Model
                     // Connected, need to be merged
                     _grid.GetBlock(startPos).ToNullBlock();
                     _grid.GetBlock(endPos).ToNullBlock();
+
+                    _score.Merged();
                     _sePlayer.Merged(); // Merged SE
 
                     // Goto check game end
@@ -612,6 +597,7 @@ namespace LianLianXuan_Prj.Model
         {
             _grid.Randomize();
 
+            _score.Refresh();
             _sePlayer.Refresh(); // Refresh SE
         }
 
@@ -619,7 +605,9 @@ namespace LianLianXuan_Prj.Model
         {
             // Restart Game
             _grid.Reset();
+            _score.Reset();
             _tuple.Clear();
+
             _gameState = GameState.PLAYING;
         }
     }

@@ -6,26 +6,37 @@ namespace LianLianXuan_Prj.View
     public class GameEndView : View
     {
         private readonly Bitmap _bgp; // Game End background picture
-        private Model.Model _model; // model
+        private Rectangle _wigetSize;
+
+        private Font _drawFont;
+        private Brush _drawBrush;
+        private StringFormat _stringFormat;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="model">Game Model</param>
-        public GameEndView(Model.Model model)
+        public GameEndView(Model.Model model, Rectangle wigetSize)
+            : base(model)
         {
             _bgp = new Bitmap(@"images/Win.jpg");
-            // Init. Model
             _model = model;
+            _wigetSize = wigetSize;
+
+            _drawFont = new Font(@"黑体", 40);
+            _drawBrush = new SolidBrush(Color.Aqua);
+            _stringFormat = new StringFormat(StringFormatFlags.DirectionRightToLeft);
+            _stringFormat.Alignment = StringAlignment.Center;
+            _stringFormat.LineAlignment = StringAlignment.Center;
         }
 
         public override void Paint(Graphics g)
         {
-            // Determine the game state
+            // Check the game state
             if (_model.GetState() == Model.Model.GameState.END)
             {
-                Rectangle rect = new Rectangle(0, 0, 1070, 890);
-                g.DrawImage(_bgp, rect);
+                g.DrawImage(_bgp, _wigetSize);
+                g.DrawString(_model.GetTotalScore().ToString(), _drawFont, _drawBrush, 676, 600);
             }
         }
     }

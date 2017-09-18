@@ -95,8 +95,8 @@ namespace LianLianXuan_Prj.Model
             serializedBlocks.AddRange(_serialize());
             // Randomize
             Block[] randomizedBlocks = new Block[Model.GRID_BLOCK_CNT_X * Model.GRID_BLOCK_CNT_Y];
-            Random prng = new Random(10);
-            //Random prng = new Random();
+            //Random prng = new Random(10);
+            Random prng = new Random();
             int cnt = 0;
             while (serializedBlocks.Count != 0)
             {

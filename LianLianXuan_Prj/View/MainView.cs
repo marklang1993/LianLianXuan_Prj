@@ -9,7 +9,6 @@ namespace LianLianXuan_Prj.View
     public class MainView : View
     {
         private readonly Bitmap[] _blockImages; // block images
-        private Model.Model _model; // model
 
         private const int BOARDER_STROKE_SIZE = 3; // boarder stroke size in pixel
 
@@ -18,6 +17,7 @@ namespace LianLianXuan_Prj.View
         /// </summary>
         /// <param name="model">Game Model</param>
         public MainView(Model.Model model)
+            : base(model)
         {
             // Load all block images
             _blockImages = new Bitmap[Model.Model.IMAGES_CNT];

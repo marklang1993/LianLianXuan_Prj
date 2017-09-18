@@ -9,6 +9,9 @@ namespace LianLianXuan_Prj
     {
         private const int FPS = 30;
 
+        private const int DRAW_OFFSET_W = 28;
+        private const int DRAW_OFFSET_H = 40;
+
         private View.ViewManager _viewManager;
         private Model.Model _mainModel;
         private Controller.Controller _mainController;
@@ -19,10 +22,13 @@ namespace LianLianXuan_Prj
 
             // Init. all data members
             // 1. View
-            int wigetWidth = (Model.Model.TOT_BLOCK_CNT_X - 1)*Model.Model.BLOCK_MARGIN
-                             + Model.Model.TOT_BLOCK_CNT_X * Model.Model.BLOCK_SIZE_X;
-            int wigetHeight = (Model.Model.TOT_BLOCK_CNT_Y - 1) * Model.Model.BLOCK_MARGIN
-                             + Model.Model.TOT_BLOCK_CNT_Y * Model.Model.BLOCK_SIZE_Y;
+            int drawWidth = (Model.Model.TOT_BLOCK_CNT_X - 1)*Model.Model.BLOCK_MARGIN
+                            + Model.Model.TOT_BLOCK_CNT_X*Model.Model.BLOCK_SIZE_X;
+            int drawHeight = (Model.Model.TOT_BLOCK_CNT_Y - 1) * Model.Model.BLOCK_MARGIN
+                             + Model.Model.TOT_BLOCK_CNT_Y * Model.Model.BLOCK_SIZE_Y
+                             + ScoreView.SCORE_VIEW_HEIGHT;
+            int wigetWidth = drawWidth + DRAW_OFFSET_W;
+            int wigetHeight = drawHeight + DRAW_OFFSET_H;
             this.Size = new Size(wigetWidth, wigetHeight); // Reset size of the main form
             Rectangle wigetSize = new Rectangle(0, 0, wigetWidth, wigetHeight);
             _viewManager = new ViewManager(this.CreateGraphics(), wigetSize);
@@ -30,7 +36,8 @@ namespace LianLianXuan_Prj
             _mainModel = new Model.Model();
             // - Bind all Views
             _viewManager.Bind(new MainView(_mainModel));
-            _viewManager.Bind(new GameEndView(_mainModel));
+            _viewManager.Bind(new GameEndView(_mainModel, wigetSize));
+            _viewManager.Bind(new ScoreView(_mainModel, new Size(drawWidth, drawHeight)));
             // 3. Controller
             _mainController = new Controller.Controller(_mainModel);
 
