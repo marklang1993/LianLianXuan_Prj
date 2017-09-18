@@ -334,6 +334,126 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
+        /// Check is there a path by give line segment
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="grid"></param>
+        /// <returns></returns>
+        private bool _isExistedPath(Tuple line, Grid grid)
+        {
+            bool isHorizontalLine = _isHorizontal(line);
+            Position start = line.GetFirst();
+            Position end = line.GetSecond();
+
+            if (isHorizontalLine)
+            {
+                // Horizontal Line
+                for (int i = start.X; i <= end.X; ++i)
+                {
+                    if (!grid.GetBlock(new Position(i, start.Y)).IsNull())
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                // Vertical Line
+                for (int i = start.Y; i <= end.Y; ++i)
+                {
+                    if (!grid.GetBlock(new Position(start.X, i)).IsNull())
+                    {
+                        return false;
+                    }
+                }
+
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Check is there a path with 2 turning points
+        /// </summary>
+        /// <param name="hStartTuple"></param>
+        /// <param name="vStartTuple"></param>
+        /// <param name="hEndTuple"></param>
+        /// <param name="vEndTuple"></param>
+        /// <param name="grid"></param>
+        /// <returns></returns>
+        private bool _isTuringTwice(Tuple hStartTuple, Tuple vStartTuple, Tuple hEndTuple, Tuple vEndTuple, Grid grid)
+        {
+            Tuple lineSegment;
+
+            // Both horizontal lines - Base: hStartTuple
+            Position hStartA = hStartTuple.GetFirst();
+            Position hStartB = hStartTuple.GetSecond();
+            Position hEndA = hEndTuple.GetFirst();
+            Position hEndB = hEndTuple.GetSecond();
+            // Validation
+            if (hStartA.X > hStartB.X) throw new Exception();
+            if (hEndA.Y > hEndB.Y) throw new Exception();
+            // Enumerate all possible line segments between lines: hStart and hEnd
+            lineSegment = new Tuple(grid);
+            for (int i = hStartA.X; i <= hStartB.X; ++i)
+            {
+                lineSegment.Clear();
+                if (i >= hEndA.X && i <= hEndB.X)
+                {
+                    // Existed that path
+                    if (hStartA.Y <= hEndA.Y)
+                    {
+                        // hStartA is upper line
+                        lineSegment.Select(new Position(i, hStartA.Y));
+                        lineSegment.Select(new Position(i, hEndA.Y));
+                    }
+                    else
+                    {
+                        // hEndA is upper line
+                        lineSegment.Select(new Position(i, hEndA.Y));
+                        lineSegment.Select(new Position(i, hStartA.Y));
+                    }
+                    // Check this line segment is a valid path
+                    if (_isExistedPath(lineSegment, grid)) return true;
+                }
+            }
+
+            // Both vertical lines - Base: vStartTuple
+            Position vStartA = vStartTuple.GetFirst();
+            Position vStartB = vStartTuple.GetSecond();
+            Position vEndA = vEndTuple.GetFirst();
+            Position vEndB = vEndTuple.GetSecond();
+            // Validation
+            if (vStartA.X > vStartB.X) throw new Exception();
+            if (vEndA.Y > vEndB.Y) throw new Exception();
+            // Enumerate all possible line segments between lines: vStart and vEnd
+            lineSegment = new Tuple(grid);
+            for (int i = vStartA.Y; i <= vStartB.Y; ++i)
+            {
+                lineSegment.Clear();
+                if (i >= vEndA.Y && i <= vEndB.Y)
+                {
+                    // Existed that path
+                    if (vStartA.X <= vEndA.X)
+                    {
+                        // vStartA is left line
+                        lineSegment.Select(new Position(vStartA.X, i));
+                        lineSegment.Select(new Position(vEndA.X, i));
+                    }
+                    else
+                    {
+                        // vEndA is left line
+                        lineSegment.Select(new Position(vEndA.X, i));
+                        lineSegment.Select(new Position(vStartA.X, i));
+                    }
+                    // Check this line segment is a valid path
+                    if (_isExistedPath(lineSegment, grid)) return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Deterimine two blocks can be connected
         /// </summary>
         /// <param name="startPos">Start block position</param>
@@ -360,12 +480,13 @@ namespace LianLianXuan_Prj.Model
 
             bool ret = false;
             // #1 No turing
-            ret = ret || _isIntersect(hStartTuple, hEndTuple);
+            ret = _isIntersect(hStartTuple, hEndTuple);
             ret = ret || _isIntersect(hStartTuple, hEndTuple);
             // #2 Turing once
             ret = ret || _isIntersect(hStartTuple, vEndTuple);
             ret = ret || _isIntersect(vStartTuple, hEndTuple);
             // #3 Turing twice
+            ret = ret || _isTuringTwice(hStartTuple, vStartTuple, hEndTuple, vEndTuple, grid);
             
             return ret;
         }
