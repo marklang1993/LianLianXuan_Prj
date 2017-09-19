@@ -38,6 +38,7 @@ namespace LianLianXuan_Prj
             _viewManager.Bind(new MainView(_mainModel));
             _viewManager.Bind(new GameEndView(_mainModel, wigetSize));
             _viewManager.Bind(new ScoreView(_mainModel, new Size(drawWidth, drawHeight)));
+            _viewManager.Bind(new PathView(_mainModel));
             // 3. Controller
             _mainController = new Controller.Controller(_mainModel);
 

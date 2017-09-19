@@ -22,7 +22,7 @@
         /// </summary>
         public void Merged()
         {
-            _currentScore += ADD_PER_MERGED;
+            _currentScore += ADD_PER_MERGED * (_comboCount + 1);
             ++_comboCount;
         }
 

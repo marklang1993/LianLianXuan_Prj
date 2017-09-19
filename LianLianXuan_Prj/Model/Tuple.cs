@@ -21,9 +21,6 @@ namespace LianLianXuan_Prj.Model
         /// <returns></returns>
         public bool Select(Position pos)
         {
-/*            // Check selected block is valid
-            if (_grid.GetBlock(pos).IsNull()) return false;*/
-
             // Set block
             if (firstBlock == null && secondBlock == null)
             {

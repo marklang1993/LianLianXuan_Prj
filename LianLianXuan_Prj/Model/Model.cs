@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing.Text;
+using System.Threading;
 
 namespace LianLianXuan_Prj.Model
 {
@@ -25,12 +27,15 @@ namespace LianLianXuan_Prj.Model
         };
 
         // Members
-        private BGMPlayer _bgmPlayer;
-        private SEPlayer _sePlayer;
-        private Grid _grid; // The whole grid
-        private Tuple _tuple; // The selected blocks' position (only 2 blocks)
+        private Semaphore _resourceMutex;
+        private readonly BGMPlayer _bgmPlayer;
+        private readonly SEPlayer _sePlayer;
         private GameState _gameState;
-        private Score _score;
+
+        private readonly Grid _grid; // The whole grid
+        private readonly Tuple _tuple; // The selected blocks' position (only 2 blocks)
+        private readonly Score _score; // Score
+        private List<Position> _pathNodes; // All turning, start, end points of a path 
 
 
         /// <summary>
@@ -40,14 +45,17 @@ namespace LianLianXuan_Prj.Model
         {
             // Init.
             _gameState = GameState.START;
+
+            _resourceMutex = new Semaphore(1, 1, "LianLianXuan_ResourceMutex");
             _bgmPlayer = new BGMPlayer();
             _sePlayer = new SEPlayer();
             _grid = new Grid();
             _tuple = new Tuple(_grid);
             _score = new Score();
+            _pathNodes = new List<Position>(4);
 
             _gameState = GameState.PLAYING;
-            _bgmPlayer.Play();
+            //_bgmPlayer.Play();
 
             // Test();
         }
@@ -225,10 +233,11 @@ namespace LianLianXuan_Prj.Model
         /// </summary>
         /// <param name="lineA">Line A</param>
         /// <param name="lineB">Line B</param>
+        /// <param name="intersection">Intersection point</param>
         /// <returns></returns>
-        private bool _isIntersect(Tuple lineA, Tuple lineB)
+        private bool _isIntersect(Tuple lineA, Tuple lineB, out Position intersection)
         {
-            Position intersection = null;
+            intersection = null;
             bool isHorizontalLineA = _isHorizontal(lineA);
             bool isHorizontalLineB = _isHorizontal(lineB);
             Position startA = lineA.GetFirst();
@@ -347,10 +356,18 @@ namespace LianLianXuan_Prj.Model
         /// <param name="hEndTuple"></param>
         /// <param name="vEndTuple"></param>
         /// <param name="grid"></param>
+        /// <param name="intersections"></param>
         /// <returns></returns>
-        private bool _isTuringTwice(Tuple hStartTuple, Tuple vStartTuple, Tuple hEndTuple, Tuple vEndTuple, Grid grid)
+        private bool _isTuringTwice(
+            Tuple hStartTuple, 
+            Tuple vStartTuple, 
+            Tuple hEndTuple, 
+            Tuple vEndTuple, 
+            Grid grid,
+            out Position[] intersections)
         {
             Tuple lineSegment;
+            intersections = null;
 
             // Both horizontal lines - Base: hStartTuple
             Position hStartA = hStartTuple.GetFirst();
@@ -381,7 +398,13 @@ namespace LianLianXuan_Prj.Model
                         lineSegment.Select(new Position(i, hStartA.Y));
                     }
                     // Check this line segment is a valid path
-                    if (_isExistedPath(lineSegment, grid)) return true;
+                    if (_isExistedPath(lineSegment, grid))
+                    {
+                        intersections = new Position[2];
+                        intersections[0] = lineSegment.GetFirst();
+                        intersections[1] = lineSegment.GetSecond();
+                        return true;
+                    }
                 }
             }
 
@@ -414,7 +437,13 @@ namespace LianLianXuan_Prj.Model
                         lineSegment.Select(new Position(vStartA.X, i));
                     }
                     // Check this line segment is a valid path
-                    if (_isExistedPath(lineSegment, grid)) return true;
+                    if (_isExistedPath(lineSegment, grid))
+                    {
+                        intersections = new Position[2];
+                        intersections[0] = lineSegment.GetFirst();
+                        intersections[1] = lineSegment.GetSecond(); 
+                        return true;
+                    }
                 }
             }
 
@@ -446,17 +475,78 @@ namespace LianLianXuan_Prj.Model
             Tuple hEndTuple = _expandHorizontal(endPos, grid, end.GetImageId());
             Tuple vEndTuple = _expandVertical(endPos, grid, end.GetImageId());
 
-            bool ret = false;
+            Position intersection;
+            Position[] intersections;
             // #1 No turing
-            ret = _isIntersect(hStartTuple, hEndTuple);
-            ret = ret || _isIntersect(hStartTuple, hEndTuple);
+            if (_isIntersect(hStartTuple, hEndTuple, out intersection))
+            {
+                AcquireResourceMutex();
+                _pathNodes.Clear();
+                _pathNodes.Add(startPos);
+                _pathNodes.Add(intersection);
+                _pathNodes.Add(endPos);
+                ReleaseResourceMutex();
+                return true;
+            }
+            if (_isIntersect(vStartTuple, vEndTuple, out intersection))
+            {
+                AcquireResourceMutex();
+                _pathNodes.Clear();
+                _pathNodes.Add(startPos);
+                _pathNodes.Add(intersection);
+                _pathNodes.Add(endPos);
+                ReleaseResourceMutex();
+                return true;
+            }
             // #2 Turing once
-            ret = ret || _isIntersect(hStartTuple, vEndTuple);
-            ret = ret || _isIntersect(vStartTuple, hEndTuple);
+            if (_isIntersect(hStartTuple, vEndTuple, out intersection))
+            {
+                AcquireResourceMutex();
+                _pathNodes.Clear();
+                _pathNodes.Add(startPos);
+                _pathNodes.Add(intersection);
+                _pathNodes.Add(endPos);
+                ReleaseResourceMutex();
+                return true;
+            }
+            if (_isIntersect(vStartTuple, hEndTuple, out intersection))
+            {
+                AcquireResourceMutex();
+                _pathNodes.Clear();
+                _pathNodes.Add(startPos);
+                _pathNodes.Add(intersection);
+                _pathNodes.Add(endPos);
+                ReleaseResourceMutex();
+                return true;
+            }
             // #3 Turing twice
-            ret = ret || _isTuringTwice(hStartTuple, vStartTuple, hEndTuple, vEndTuple, grid);
-            
-            return ret;
+            if (_isTuringTwice(
+                hStartTuple,
+                vStartTuple,
+                hEndTuple,
+                vEndTuple,
+                grid,
+                out intersections))
+            {
+                AcquireResourceMutex();
+                _pathNodes.Clear();
+                _pathNodes.Add(startPos);
+                // Check the line is straight
+                if (!(intersections[0].X == startPos.X ||
+                    intersections[0].Y == startPos.Y))
+                {
+                    // Swap
+                    Position temp = intersections[0];
+                    intersections[0] = intersections[1];
+                    intersections[1] = temp;
+                }
+                _pathNodes.AddRange(intersections);
+                _pathNodes.Add(endPos);
+                ReleaseResourceMutex();
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -486,6 +576,22 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
+        /// Acquire Resource Mutex
+        /// </summary>
+        public void AcquireResourceMutex()
+        {
+            _resourceMutex.WaitOne();
+        }
+
+        /// <summary>
+        /// Release Resource Mutex
+        /// </summary>
+        public void ReleaseResourceMutex()
+        {
+            _resourceMutex.Release(1);
+        }
+
+        /// <summary>
         /// Get Map
         /// </summary>
         /// <returns></returns>
@@ -510,6 +616,15 @@ namespace LianLianXuan_Prj.Model
         public Score GetScore()
         {
             return _score;
+        }
+
+        /// <summary>
+        /// Get a valid path
+        /// </summary>
+        /// <returns></returns>
+        public List<Position> GetConnectedPath()
+        {
+            return _pathNodes;
         }
 
         /// <summary>
@@ -552,6 +667,9 @@ namespace LianLianXuan_Prj.Model
             int x = xMouse / (Model.BLOCK_SIZE_X + Model.BLOCK_MARGIN);
             int y = yMouse / (Model.BLOCK_SIZE_Y + Model.BLOCK_MARGIN);
             Position blockPosition = new Position(x, y);
+            // Check selected block is valid
+            if (_grid.GetBlock(blockPosition).IsNull()) return;
+            // Check tuple is selectable
             if (!_tuple.Select(blockPosition)) return;
 
             // Check is connected AND required to merge
