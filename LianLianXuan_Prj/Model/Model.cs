@@ -504,12 +504,12 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
-        /// Get total score
+        /// Get score struct
         /// </summary>
         /// <returns></returns>
-        public int GetTotalScore()
+        public Score GetScore()
         {
-            return _score.GetTotalScore();
+            return _score;
         }
 
         /// <summary>
@@ -530,6 +530,8 @@ namespace LianLianXuan_Prj.Model
         {
             // Check the game state
             if (_gameState != GameState.PLAYING) return;
+
+            _score.ComboInterrupted();
 
             _tuple.Clear();
 
@@ -573,6 +575,7 @@ namespace LianLianXuan_Prj.Model
                 }
                 else
                 {
+                    _score.ComboInterrupted();
                     _sePlayer.Failed(); // Failed SE
                 }
             }

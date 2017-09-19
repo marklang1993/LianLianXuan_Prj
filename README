@@ -1,6 +1,6 @@
-连连炫 Project（LianLianXuan Project）
+连连炫 Project
 
-为纪念炫大佬22岁生日，特制此游戏。
+为纪念炫大佬23岁生日，特制此游戏。
 版权问题，图片和音乐资源未放在本repo。
 
 操作说明：
@@ -9,3 +9,17 @@
 M键 - 播放/停止背景音乐
 R键 - 打乱所有方块
 Y键 - 游戏结束时再开一局
+
+
+
+LianLianXuan Project
+
+To memorize 23rd birthday of Boss Xuan, we developed this game.
+Due to the copyright issue, all images, sound and music are NOT included in this repo.
+
+Operations:
+Left Click  - Select a block
+Right Click - Cancel selection
+M           - Play / Stop background music
+R           - Randomize all existed blocks
+Y           - Start a new game when game is ended.

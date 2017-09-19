@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Text;
+using LianLianXuan_Prj.Model;
 
 namespace LianLianXuan_Prj.View
 {
@@ -11,7 +12,6 @@ namespace LianLianXuan_Prj.View
         private RectangleF _drawLayout; // Offset of drawing
         private Size _stageSize; // MainStage Size
 
-        private String _scoreStringPrefix;
         private Font _drawFont;
         private Brush _drawBrush;
         private StringFormat _stringFormat;
@@ -27,7 +27,6 @@ namespace LianLianXuan_Prj.View
                 SCORE_VIEW_HEIGHT
                 );
 
-            _scoreStringPrefix = @"目前得分：";
             _drawFont = new Font(@"黑体", 16);
             _drawBrush = new SolidBrush(Color.Aqua);
             _stringFormat = new StringFormat(StringFormatFlags.DirectionRightToLeft);
@@ -40,8 +39,11 @@ namespace LianLianXuan_Prj.View
            // Check the game state
            if (_model.GetState() == Model.Model.GameState.PLAYING)
            {
-               StringBuilder sb = new StringBuilder(_scoreStringPrefix);
-               sb.Append(_model.GetTotalScore().ToString());
+               Score score = _model.GetScore();
+               StringBuilder sb = new StringBuilder(@"目前得分：");
+               sb.Append(score.GetTotalScore().ToString());
+               sb.Append(@"     目前连击数：");
+               sb.Append(score.GetComboCount().ToString());
                g.DrawString(sb.ToString(), _drawFont, _drawBrush, _drawLayout, _stringFormat);
            }
         }

@@ -36,7 +36,7 @@ namespace LianLianXuan_Prj.View
             if (_model.GetState() == Model.Model.GameState.END)
             {
                 g.DrawImage(_bgp, _wigetSize);
-                g.DrawString(_model.GetTotalScore().ToString(), _drawFont, _drawBrush, 676, 600);
+                g.DrawString(_model.GetScore().GetTotalScore().ToString(), _drawFont, _drawBrush, 676, 600);
             }
         }
     }
