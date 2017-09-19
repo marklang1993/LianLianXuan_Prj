@@ -4,10 +4,12 @@
     {
         private int _currentScore; // Current Score
         private int _refreshedTimes; // Times of Manually Refreshing
+        private int _tipTimes; // Times of Requesting a Tip
         private int _comboCount; // Count of Combo
 
         private const int ADD_PER_MERGED = 10;
-        private const int DEDUCT_PER_REFRESH = 40;
+        private const int DEDUCT_PER_REFRESH = 100;
+        private const int DEDUCT_PER_TIP = 20;
 
         /// <summary>
         /// Constructor
@@ -43,12 +45,21 @@
         }
 
         /// <summary>
+        /// Deduct scores by giving a tip
+        /// </summary>
+        public void Tip()
+        {
+            ++_tipTimes;
+        }
+
+        /// <summary>
         /// Reset all score records
         /// </summary>
         public void Reset()
         {
             _currentScore = 0;
             _refreshedTimes = 0;
+            _tipTimes = 0;
             _comboCount = 0;
         }
 
@@ -58,7 +69,9 @@
         /// <returns></returns>
         public int GetTotalScore()
         {
-            return _currentScore - _refreshedTimes*DEDUCT_PER_REFRESH;
+            return _currentScore 
+                - _refreshedTimes*DEDUCT_PER_REFRESH
+                - _tipTimes*DEDUCT_PER_TIP;
         }
 
         /// <summary>

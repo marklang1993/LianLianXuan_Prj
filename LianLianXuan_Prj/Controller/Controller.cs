@@ -44,8 +44,19 @@ namespace LianLianXuan_Prj.Controller
             }
             else if (key == Keys.R)
             {
-                // Randomize all blocks
-                _model.RandonmizeAllBlocks();
+                if (_model.GetState() == Model.Model.GameState.PLAYING)
+                {
+                    // Randomize all blocks
+                    _model.RandonmizeAllBlocks();
+                }
+            }
+            else if (key == Keys.T)
+            {
+                if (_model.GetState() == Model.Model.GameState.PLAYING)
+                {
+                    // Give a tip
+                    _model.ActiveTip();
+                }
             }
             else if (key == Keys.Y)
             {

@@ -26,15 +26,23 @@ namespace LianLianXuan_Prj.Model
             END
         };
 
+        // Define MutexType
+        public enum MutexType
+        {
+            PATH_NODES,
+            TIP,
+            SIZE // NOT A TYPE!
+        }
+
         // Members
-        private Semaphore _resourceMutex;
+        private Semaphore[] _resourceMutex;
         private readonly BGMPlayer _bgmPlayer;
         private readonly SEPlayer _sePlayer;
         private GameState _gameState;
 
         private readonly Grid _grid; // The whole grid
         private readonly Tuple _tuple; // The selected blocks' position (only 2 blocks)
-        private Tuple _mergableTuple; // Block pair that can be merged
+        private Tip _mergableTuple; // Block pair that can be merged
         private readonly Score _score; // Score
         private List<Position> _pathNodes; // All turning, start, end points of a path 
 
@@ -47,7 +55,11 @@ namespace LianLianXuan_Prj.Model
             // Init.
             _gameState = GameState.START;
 
-            _resourceMutex = new Semaphore(1, 1, "LianLianXuan_ResourceMutex");
+            _resourceMutex = new Semaphore[(int)MutexType.SIZE];
+            for (int i = 0; i < _resourceMutex.Length; ++i)
+            {
+                _resourceMutex[i] = new Semaphore(1, 1, @"LianLianXuan_ResourceMutex_" + i.ToString());
+            }
             _bgmPlayer = new BGMPlayer();
             _sePlayer = new SEPlayer();
             _grid = new Grid();
@@ -56,15 +68,16 @@ namespace LianLianXuan_Prj.Model
             _pathNodes = new List<Position>(4);
 
             // Find is there any block pair that can be merged
-            _mergableTuple = _findMergableBlockPair();
-            while (_mergableTuple == null)
+            _mergableTuple = new Tip();
+            _mergableTuple.Tuple = _findMergableBlockPair();
+            while (_mergableTuple.Tuple == null)
             {
                 _grid.Randomize();
-                _mergableTuple = _findMergableBlockPair();
+                _mergableTuple.Tuple = _findMergableBlockPair();
             }
 
             _gameState = GameState.PLAYING;
-            //_bgmPlayer.Play();
+            _bgmPlayer.Play();
 
             // Test();
         }
@@ -489,43 +502,43 @@ namespace LianLianXuan_Prj.Model
             // #1 No turing
             if (_isIntersect(hStartTuple, hEndTuple, out intersection))
             {
-                AcquireResourceMutex();
+                AcquireResourceMutex(MutexType.PATH_NODES);
                 _pathNodes.Clear();
                 _pathNodes.Add(startPos);
                 _pathNodes.Add(intersection);
                 _pathNodes.Add(endPos);
-                ReleaseResourceMutex();
+                ReleaseResourceMutex(MutexType.PATH_NODES);
                 return true;
             }
             if (_isIntersect(vStartTuple, vEndTuple, out intersection))
             {
-                AcquireResourceMutex();
+                AcquireResourceMutex(MutexType.PATH_NODES);
                 _pathNodes.Clear();
                 _pathNodes.Add(startPos);
                 _pathNodes.Add(intersection);
                 _pathNodes.Add(endPos);
-                ReleaseResourceMutex();
+                ReleaseResourceMutex(MutexType.PATH_NODES);
                 return true;
             }
             // #2 Turing once
             if (_isIntersect(hStartTuple, vEndTuple, out intersection))
             {
-                AcquireResourceMutex();
+                AcquireResourceMutex(MutexType.PATH_NODES);
                 _pathNodes.Clear();
                 _pathNodes.Add(startPos);
                 _pathNodes.Add(intersection);
                 _pathNodes.Add(endPos);
-                ReleaseResourceMutex();
+                ReleaseResourceMutex(MutexType.PATH_NODES);
                 return true;
             }
             if (_isIntersect(vStartTuple, hEndTuple, out intersection))
             {
-                AcquireResourceMutex();
+                AcquireResourceMutex(MutexType.PATH_NODES);
                 _pathNodes.Clear();
                 _pathNodes.Add(startPos);
                 _pathNodes.Add(intersection);
                 _pathNodes.Add(endPos);
-                ReleaseResourceMutex();
+                ReleaseResourceMutex(MutexType.PATH_NODES);
                 return true;
             }
             // #3 Turing twice
@@ -537,7 +550,7 @@ namespace LianLianXuan_Prj.Model
                 grid,
                 out intersections))
             {
-                AcquireResourceMutex();
+                AcquireResourceMutex(MutexType.PATH_NODES);
                 _pathNodes.Clear();
                 _pathNodes.Add(startPos);
                 // Check the line is straight
@@ -551,7 +564,7 @@ namespace LianLianXuan_Prj.Model
                 }
                 _pathNodes.AddRange(intersections);
                 _pathNodes.Add(endPos);
-                ReleaseResourceMutex();
+                ReleaseResourceMutex(MutexType.PATH_NODES);
                 return true;
             }
 
@@ -648,17 +661,17 @@ namespace LianLianXuan_Prj.Model
         /// <summary>
         /// Acquire Resource Mutex
         /// </summary>
-        public void AcquireResourceMutex()
+        public void AcquireResourceMutex(MutexType type)
         {
-            _resourceMutex.WaitOne();
+            _resourceMutex[(int)type].WaitOne();
         }
 
         /// <summary>
         /// Release Resource Mutex
         /// </summary>
-        public void ReleaseResourceMutex()
+        public void ReleaseResourceMutex(MutexType type)
         {
-            _resourceMutex.Release(1);
+            _resourceMutex[(int)type].Release(1);
         }
 
         /// <summary>
@@ -701,7 +714,7 @@ namespace LianLianXuan_Prj.Model
         /// Get a tip for merging block
         /// </summary>
         /// <returns></returns>
-        public Tuple GetTip()
+        public Tip GetTip()
         {
             return _mergableTuple;
         }
@@ -770,13 +783,16 @@ namespace LianLianXuan_Prj.Model
                     if (_gameEnd()) return;
 
                     // Check is there any block can be merged
-                    _mergableTuple = _findMergableBlockPair();
-                    while (_mergableTuple == null)
+                    AcquireResourceMutex(MutexType.TIP);
+                    _mergableTuple = new Tip();
+                    _mergableTuple.Tuple = _findMergableBlockPair();
+                    while (_mergableTuple.Tuple == null)
                     {
                         _grid.Randomize();
                         _sePlayer.Refresh(); // Refresh SE
-                        _mergableTuple = _findMergableBlockPair();
+                        _mergableTuple.Tuple = _findMergableBlockPair();
                     }
+                    ReleaseResourceMutex(MutexType.TIP);
                 }
                 else
                 {
@@ -806,7 +822,31 @@ namespace LianLianXuan_Prj.Model
             _grid.Randomize();
 
             _score.Refresh();
+            _score.ComboInterrupted();
             _sePlayer.Refresh(); // Refresh SE
+        }
+
+        /// <summary>
+        /// Give a tip
+        /// </summary>
+        public void ActiveTip()
+        {
+            AcquireResourceMutex(MutexType.TIP);
+            if (_mergableTuple.IsActive)
+            {
+                // Tip has been already activated
+                ReleaseResourceMutex(MutexType.TIP);
+                return;
+            }
+            // Update Tip
+            _mergableTuple.Tuple = _findMergableBlockPair();
+            _mergableTuple.IsActive = true;
+            ReleaseResourceMutex(MutexType.TIP);
+
+            // Other operations
+            _score.Tip();
+            _score.ComboInterrupted();
+            _sePlayer.Tip(); // Tip SE
         }
 
         /// <summary>
@@ -816,8 +856,10 @@ namespace LianLianXuan_Prj.Model
         {
             // Restart Game
             _grid.Reset();
-            _score.Reset();
             _tuple.Clear();
+            _score.Reset();
+            _pathNodes.Clear();
+            _mergableTuple.Reset();
 
             _gameState = GameState.PLAYING;
         }

@@ -83,11 +83,11 @@ namespace LianLianXuan_Prj.View
 
                 // Convert Next
                 List<Position> pathNodes = _model.GetConnectedPath(); // Get raw path
-                _model.AcquireResourceMutex();
+                _model.AcquireResourceMutex(Model.Model.MutexType.PATH_NODES);
                 if (pathNodes.Count == 0)
                 {
                     // No path node existed, release & return
-                    _model.ReleaseResourceMutex();
+                    _model.ReleaseResourceMutex(Model.Model.MutexType.PATH_NODES);
                     return;
                 }
                 // Convert
@@ -97,7 +97,7 @@ namespace LianLianXuan_Prj.View
                     _pointList[i] = _positionConvertPath(pathNodes.ElementAt(i));
                 }
                 pathNodes.Clear(); // Clear the original list
-                _model.ReleaseResourceMutex();
+                _model.ReleaseResourceMutex(Model.Model.MutexType.PATH_NODES);
 
                 // Update current time
                 _curTime = DateTime.Now;

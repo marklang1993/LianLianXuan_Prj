@@ -49,5 +49,10 @@ namespace LianLianXuan_Prj.Model
         {
             _spRefresh.Play();
         }
+
+        public void Tip()
+        {
+            ;
+        }
     }
 }

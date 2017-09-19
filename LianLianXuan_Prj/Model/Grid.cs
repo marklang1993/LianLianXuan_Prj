@@ -74,9 +74,9 @@ namespace LianLianXuan_Prj.Model
             }
 
             // Merge
+            _remainedBlockPair.Remove(blockA.GetImageId());
             blockA.ToNullBlock();
             blockB.ToNullBlock();
-            _remainedBlockPair.Remove(blockA.GetImageId());
         }
 
         /// <summary>
