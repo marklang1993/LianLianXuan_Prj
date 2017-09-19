@@ -16,7 +16,7 @@ namespace LianLianXuan_Prj.View
         private SolidBrush _rectBrush;
 
 
-        private const int DISPLAY_TIME = 1000;
+        public const int DISPLAY_TIME = 1000;
 
         public PathView(Model.Model model)
             : base(model)

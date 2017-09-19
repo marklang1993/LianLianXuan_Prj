@@ -9,8 +9,9 @@ namespace LianLianXuan_Prj.View
     public class MainView : View
     {
         private readonly Bitmap[] _blockImages; // block images
+        private Pen _boarderPen;
 
-        private const int BOARDER_STROKE_SIZE = 3; // boarder stroke size in pixel
+        public const int BOARDER_STROKE_SIZE = 3; // boarder stroke size in pixel
 
         /// <summary>
         /// Constructor
@@ -28,6 +29,8 @@ namespace LianLianXuan_Prj.View
                 sb.Append(".jpg");
                 _blockImages[i] = new Bitmap(sb.ToString());
             }
+            // Init. Pen
+            _boarderPen = new Pen(Color.GreenYellow, BOARDER_STROKE_SIZE);
             // Init. Model
             _model = model;
         }
@@ -56,7 +59,7 @@ namespace LianLianXuan_Prj.View
             g.DrawImage(_blockImages[imageID], rect);
         }
 
-        private void _paintBoarder(Graphics g, int x, int y)
+        public static void PaintBoarder(Graphics g, Pen boarderPen, int x, int y)
         {
             // ZERO is illegal coordinates
             if (x == 0 || y == 0)
@@ -70,7 +73,7 @@ namespace LianLianXuan_Prj.View
             int yPixel = y * (Model.Model.BLOCK_MARGIN + Model.Model.BLOCK_SIZE_Y) - BOARDER_STROKE_SIZE;
             int width = Model.Model.BLOCK_SIZE_X + BOARDER_STROKE_SIZE;
             int height = Model.Model.BLOCK_SIZE_Y + BOARDER_STROKE_SIZE;
-            g.DrawRectangle(new Pen(Color.GreenYellow, BOARDER_STROKE_SIZE), xPixel, yPixel, width, height);
+            g.DrawRectangle(boarderPen, xPixel, yPixel, width, height);
         }
 
         public override void Paint(Graphics g)
@@ -92,8 +95,8 @@ namespace LianLianXuan_Prj.View
                 Tuple tuple = _model.GetSelectedBlocksTuple();
                 Position firstPos = tuple.GetFirst();
                 Position secondPos = tuple.GetSecond();
-                if (firstPos != null) _paintBoarder(g, firstPos.X, firstPos.Y);
-                if (secondPos != null) _paintBoarder(g, secondPos.X, secondPos.Y);
+                if (firstPos != null) PaintBoarder(g, _boarderPen, firstPos.X, firstPos.Y);
+                if (secondPos != null) PaintBoarder(g, _boarderPen, secondPos.X, secondPos.Y);
             }
         }
     }

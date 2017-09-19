@@ -7,7 +7,11 @@ namespace LianLianXuan_Prj.Model
     public class Grid
     {
         private Block[][] _map; // 2D Map of blocks
+        private HashSet<int> _remainedBlockPair; // Remained Block Pair IDs
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public Grid()
         {
             Reset();
@@ -55,6 +59,61 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
+        /// Merge a block pair
+        /// </summary>
+        /// <param name="posA"></param>
+        /// <param name="posB"></param>
+        public void Merge(Position posA, Position posB)
+        {
+            // Check
+            Block blockA = GetBlock(posA);
+            Block blockB = GetBlock(posB);
+            if (blockA.GetImageId() != blockB.GetImageId())
+            {
+                throw new Exception("Image Type is Different.");
+            }
+
+            // Merge
+            blockA.ToNullBlock();
+            blockB.ToNullBlock();
+            _remainedBlockPair.Remove(blockA.GetImageId());
+        }
+
+        /// <summary>
+        /// Find Block Pair
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Tuple FindBlockPair(int id)
+        {
+            Tuple tuple = new Tuple(this);
+            for (int j = 1; j < Model.TOT_BLOCK_CNT_Y - 1; ++j)
+            {
+                for (int i = 1; i < Model.TOT_BLOCK_CNT_X - 1; ++i)
+                {
+                    if (_map[i][j].GetImageId() == id)
+                    {
+                        tuple.Select(new Position(i, j));
+                        if (tuple.IsTuple())
+                        {
+                            return tuple;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get all remained block IDs
+        /// </summary>
+        /// <returns></returns>
+        public HashSet<int> GetAllRemaindBlockID()
+        {
+            return _remainedBlockPair;
+        }
+
+        /// <summary>
         /// Reset Grid
         /// </summary>
         public void Reset()
@@ -81,6 +140,13 @@ namespace LianLianXuan_Prj.Model
                 serializedBlocks[i].ToValidBlock(i / 2);
             }
             _deserialize(serializedBlocks);
+            // Init. Remained pair set
+            _remainedBlockPair = new HashSet<int>();
+            for (int i = 0; i < Model.GRID_BLOCK_CNT_X*Model.GRID_BLOCK_CNT_Y/2; ++i)
+            {
+                _remainedBlockPair.Add(i);
+            }
+
             // Randomize
             Randomize();
         }
@@ -120,22 +186,12 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
-        /// Check all blocks in play areas are invalid
+        /// Check is game ended
         /// </summary>
         /// <returns></returns>
-        public bool IsAllInvalid()
+        public bool IsGameEnd()
         {
-            bool ret = true;
-
-            for (int j = 1; j < Model.TOT_BLOCK_CNT_Y - 1; ++j)
-            {
-                for (int i = 1; i < Model.TOT_BLOCK_CNT_X - 1; ++i)
-                {
-                    ret = ret && _map[i][j].IsNull();
-                }
-            }
-
-            return ret;
+            return _remainedBlockPair.Count == 0;
         }
 
         /// <summary>

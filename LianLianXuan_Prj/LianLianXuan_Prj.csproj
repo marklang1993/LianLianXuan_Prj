@@ -64,6 +64,7 @@
     <Compile Include="View\MainView.cs" />
     <Compile Include="View\PathView.cs" />
     <Compile Include="View\ScoreView.cs" />
+    <Compile Include="View\TipView.cs" />
     <Compile Include="View\View.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

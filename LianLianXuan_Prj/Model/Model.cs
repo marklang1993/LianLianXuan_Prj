@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Text;
 using System.Threading;
+using LianLianXuan_Prj.View;
 
 namespace LianLianXuan_Prj.Model
 {
@@ -34,6 +34,7 @@ namespace LianLianXuan_Prj.Model
 
         private readonly Grid _grid; // The whole grid
         private readonly Tuple _tuple; // The selected blocks' position (only 2 blocks)
+        private Tuple _mergableTuple; // Block pair that can be merged
         private readonly Score _score; // Score
         private List<Position> _pathNodes; // All turning, start, end points of a path 
 
@@ -53,6 +54,14 @@ namespace LianLianXuan_Prj.Model
             _tuple = new Tuple(_grid);
             _score = new Score();
             _pathNodes = new List<Position>(4);
+
+            // Find is there any block pair that can be merged
+            _mergableTuple = _findMergableBlockPair();
+            while (_mergableTuple == null)
+            {
+                _grid.Randomize();
+                _mergableTuple = _findMergableBlockPair();
+            }
 
             _gameState = GameState.PLAYING;
             //_bgmPlayer.Play();
@@ -552,14 +561,75 @@ namespace LianLianXuan_Prj.Model
         /// <summary>
         /// Game End Related Processing
         /// </summary>
-        private void _gameEnd()
+        private bool _gameEnd()
         {
             // Check
-            if (_grid.IsAllInvalid())
+            if (_grid.IsGameEnd())
             {
                 // Game is end
                 _gameState = GameState.END;
+                return true;
             }
+            return false;
+        }
+
+        /// <summary>
+        /// Find a Block Pair that can be merged
+        /// </summary>
+        /// <returns></returns>
+        private Tuple _findMergableBlockPair()
+        {
+            HashSet<int> remainedBlockPair = _grid.GetAllRemaindBlockID();
+            foreach (int id in remainedBlockPair)
+            {
+                Tuple tuple = _grid.FindBlockPair(id);
+                if (tuple != null)
+                {
+                    Position intersection;
+                    Position[] intersections;
+                    Position startPos = tuple.GetFirst();
+                    Position endPos = tuple.GetSecond();
+                    Block start = _grid.GetBlock(startPos);
+                    Block end = _grid.GetBlock(endPos);
+                    // Check
+                    // Expand vertically and horizontally
+                    Tuple hStartTuple = _expandHorizontal(startPos, _grid, start.GetImageId());
+                    Tuple vStartTuple = _expandVertical(startPos, _grid, start.GetImageId());
+                    Tuple hEndTuple = _expandHorizontal(endPos, _grid, end.GetImageId());
+                    Tuple vEndTuple = _expandVertical(endPos, _grid, end.GetImageId());
+                    // #1 No turing
+                    if (_isIntersect(hStartTuple, hEndTuple, out intersection))
+                    {
+                        return tuple;
+                    }
+                    if (_isIntersect(hStartTuple, hEndTuple, out intersection))
+                    {
+                        return tuple;
+                    }
+                    // #2 Turing once
+                    if (_isIntersect(hStartTuple, vEndTuple, out intersection))
+                    {
+                        return tuple;
+                    }
+                    if (_isIntersect(vStartTuple, hEndTuple, out intersection))
+                    {
+                        return tuple;
+                    }
+                    // #3 Turing twice
+                    if (_isTuringTwice(
+                        hStartTuple,
+                        vStartTuple,
+                        hEndTuple,
+                        vEndTuple,
+                        _grid,
+                        out intersections
+                        ))
+                    {
+                        return tuple;
+                    }
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -628,6 +698,15 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
+        /// Get a tip for merging block
+        /// </summary>
+        /// <returns></returns>
+        public Tuple GetTip()
+        {
+            return _mergableTuple;
+        }
+
+        /// <summary>
         /// Get Current Game State
         /// </summary>
         /// <returns></returns>
@@ -682,14 +761,22 @@ namespace LianLianXuan_Prj.Model
                 if (_isConnected(startPos, endPos, _grid))
                 {
                     // Connected, need to be merged
-                    _grid.GetBlock(startPos).ToNullBlock();
-                    _grid.GetBlock(endPos).ToNullBlock();
+                    _grid.Merge(startPos, endPos);
 
                     _score.Merged();
                     _sePlayer.Merged(); // Merged SE
 
                     // Goto check game end
-                    _gameEnd();
+                    if (_gameEnd()) return;
+
+                    // Check is there any block can be merged
+                    _mergableTuple = _findMergableBlockPair();
+                    while (_mergableTuple == null)
+                    {
+                        _grid.Randomize();
+                        _sePlayer.Refresh(); // Refresh SE
+                        _mergableTuple = _findMergableBlockPair();
+                    }
                 }
                 else
                 {
@@ -722,6 +809,9 @@ namespace LianLianXuan_Prj.Model
             _sePlayer.Refresh(); // Refresh SE
         }
 
+        /// <summary>
+        /// Restart the Game
+        /// </summary>
         public void RestartGame()
         {
             // Restart Game
