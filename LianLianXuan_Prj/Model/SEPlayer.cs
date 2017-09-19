@@ -9,6 +9,7 @@ namespace LianLianXuan_Prj.Model
         private SoundPlayer _spMerged;
         private SoundPlayer _spCancel;
         private SoundPlayer _spRefresh;
+        private SoundPlayer _spTip;
 
         public SEPlayer()
         {
@@ -17,12 +18,14 @@ namespace LianLianXuan_Prj.Model
             _spMerged = new SoundPlayer();
             _spCancel = new SoundPlayer();
             _spRefresh = new SoundPlayer();
+            _spTip = new SoundPlayer(); 
 
             _spClicked.SoundLocation = @"music\clicked.wav";
             _spFailed.SoundLocation = @"music\failed.wav";
             _spMerged.SoundLocation = @"music\merged.wav";
             _spCancel.SoundLocation = @"music\cancel.wav";
             _spRefresh.SoundLocation = @"music\refresh.wav";
+            _spTip.SoundLocation = @"music\tip.wav";
         }
 
         public void Clicked()
@@ -52,7 +55,7 @@ namespace LianLianXuan_Prj.Model
 
         public void Tip()
         {
-            ;
+            _spTip.Play();
         }
     }
 }

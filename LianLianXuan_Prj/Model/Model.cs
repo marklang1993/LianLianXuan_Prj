@@ -77,7 +77,7 @@ namespace LianLianXuan_Prj.Model
             }
 
             _gameState = GameState.PLAYING;
-            _bgmPlayer.Play();
+            //_bgmPlayer.Play();
 
             // Test();
         }
@@ -505,7 +505,7 @@ namespace LianLianXuan_Prj.Model
                 AcquireResourceMutex(MutexType.PATH_NODES);
                 _pathNodes.Clear();
                 _pathNodes.Add(startPos);
-                _pathNodes.Add(intersection);
+                //_pathNodes.Add(intersection);
                 _pathNodes.Add(endPos);
                 ReleaseResourceMutex(MutexType.PATH_NODES);
                 return true;
@@ -515,7 +515,7 @@ namespace LianLianXuan_Prj.Model
                 AcquireResourceMutex(MutexType.PATH_NODES);
                 _pathNodes.Clear();
                 _pathNodes.Add(startPos);
-                _pathNodes.Add(intersection);
+                //_pathNodes.Add(intersection);
                 _pathNodes.Add(endPos);
                 ReleaseResourceMutex(MutexType.PATH_NODES);
                 return true;

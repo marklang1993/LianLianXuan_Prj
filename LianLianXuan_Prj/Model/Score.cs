@@ -6,6 +6,7 @@
         private int _refreshedTimes; // Times of Manually Refreshing
         private int _tipTimes; // Times of Requesting a Tip
         private int _comboCount; // Count of Combo
+        private int _comboCountMax; // Maximum count of Combo
 
         private const int ADD_PER_MERGED = 10;
         private const int DEDUCT_PER_REFRESH = 100;
@@ -26,6 +27,11 @@
         {
             _currentScore += ADD_PER_MERGED * (_comboCount + 1);
             ++_comboCount;
+            // Set Max Combo Count
+            if (_comboCountMax < _comboCount)
+            {
+                _comboCountMax = _comboCount;
+            }
         }
 
         /// <summary>
@@ -61,6 +67,7 @@
             _refreshedTimes = 0;
             _tipTimes = 0;
             _comboCount = 0;
+            _comboCountMax = 0;
         }
 
         /// <summary>
@@ -81,6 +88,15 @@
         public int GetComboCount()
         {
             return _comboCount;
+        }
+
+        /// <summary>
+        /// Get Maximum Combo Count
+        /// </summary>
+        /// <returns></returns>
+        public int GetMaxComboCount()
+        {
+            return _comboCountMax;
         }
     }
 }

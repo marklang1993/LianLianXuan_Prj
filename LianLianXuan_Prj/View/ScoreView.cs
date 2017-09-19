@@ -42,7 +42,7 @@ namespace LianLianXuan_Prj.View
                Score score = _model.GetScore();
                StringBuilder sb = new StringBuilder(@"目前得分：");
                sb.Append(score.GetTotalScore().ToString());
-               sb.Append(@"     目前连击数：");
+               sb.Append(@"     目前连续炫技次数：");
                sb.Append(score.GetComboCount().ToString());
                g.DrawString(sb.ToString(), _drawFont, _drawBrush, _drawLayout, _stringFormat);
            }
