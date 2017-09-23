@@ -1,7 +1,10 @@
-﻿namespace LianLianXuan_Prj.Model
+﻿using System;
+
+namespace LianLianXuan_Prj.Model
 {
     public class Score
     {
+        private DateTime _startTime; // Starting Time
         private int _currentScore; // Current Score
         private int _refreshedTimes; // Times of Manually Refreshing
         private int _tipTimes; // Times of Requesting a Tip
@@ -63,6 +66,7 @@
         /// </summary>
         public void Reset()
         {
+            _startTime = DateTime.Now;
             _currentScore = 0;
             _refreshedTimes = 0;
             _tipTimes = 0;
@@ -79,6 +83,15 @@
             return _currentScore 
                 - _refreshedTimes*DEDUCT_PER_REFRESH
                 - _tipTimes*DEDUCT_PER_TIP;
+        }
+
+        /// <summary>
+        /// Get Total Ticks of starting time
+        /// </summary>
+        /// <returns></returns>
+        public long GetTotalTicks()
+        {
+            return _startTime.Ticks;
         }
 
         /// <summary>
