@@ -2,26 +2,19 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LianLianXuan_Prj.Model;
 
 namespace LianLianXuan_Prj.View
 {
-    public class PathView : View
+    public class PathView : DelayedDisplayView
     {
-        private DateTime _curTime;
         private Point[] _pointList;
         private Pen _linePen;
         private SolidBrush _rectBrush;
 
-
-        public const int DISPLAY_TIME = 1000;
-
         public PathView(Model.Model model)
             : base(model)
         {
-            _curTime = DateTime.Now;
             _pointList = null;
             _linePen = new Pen(Color.Blue, 3);
             _rectBrush = new SolidBrush(Color.GreenYellow);
@@ -56,52 +49,40 @@ namespace LianLianXuan_Prj.View
             return rect;
         }
 
-        public override void Paint(Graphics g)
+        protected override void Draw(Graphics g)
         {
-            // Check the game state
-            if (_model.GetState() == Model.Model.GameState.PLAYING)
+            if (_pointList == null) return;
+            // Draw Block
+            int endIdx = _pointList.Length - 1;
+            Rectangle startRect = _positionConvertBlock(new Position(_pointList[0].X, _pointList[0].Y));
+            Rectangle endRect = _positionConvertBlock(new Position(_pointList[endIdx].X, _pointList[endIdx].Y));
+            g.FillRectangle(_rectBrush, startRect);
+            g.FillRectangle(_rectBrush, endRect);
+            // Draw path
+            g.DrawLines(_linePen, _pointList);
+        }
+
+        protected override bool Update()
+        {
+            // Convert Next
+            List<Position> pathNodes = _model.GetConnectedPath(); // Get raw path
+            _model.AcquireResourceMutex(Model.Model.MutexType.PATH_NODES);
+            if (pathNodes.Count == 0)
             {
-                // Draw
-                TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - _curTime.Ticks);
-                if (timeSpan.TotalMilliseconds < DISPLAY_TIME)
-                {
-                    // Still in its lifetime
-                    if (_pointList != null)
-                    {
-                        // Draw Block
-                        int endIdx = _pointList.Length - 1;
-                        Rectangle startRect = _positionConvertBlock(new Position(_pointList[0].X, _pointList[0].Y));
-                        Rectangle endRect = _positionConvertBlock(new Position(_pointList[endIdx].X, _pointList[endIdx].Y));
-                        g.FillRectangle(_rectBrush, startRect);
-                        g.FillRectangle(_rectBrush, endRect);
-                        // Draw path
-                        g.DrawLines(_linePen, _pointList);
-                    }
-                    return;
-                }
-                _pointList = null;
-
-                // Convert Next
-                List<Position> pathNodes = _model.GetConnectedPath(); // Get raw path
-                _model.AcquireResourceMutex(Model.Model.MutexType.PATH_NODES);
-                if (pathNodes.Count == 0)
-                {
-                    // No path node existed, release & return
-                    _model.ReleaseResourceMutex(Model.Model.MutexType.PATH_NODES);
-                    return;
-                }
-                // Convert
-                _pointList = new Point[pathNodes.Count];
-                for (int i = 0; i < pathNodes.Count; ++i)
-                {
-                    _pointList[i] = _positionConvertPath(pathNodes.ElementAt(i));
-                }
-                pathNodes.Clear(); // Clear the original list
+                // No path node existed, release & return
                 _model.ReleaseResourceMutex(Model.Model.MutexType.PATH_NODES);
-
-                // Update current time
-                _curTime = DateTime.Now;
+                return false;
             }
+            // Convert
+            _pointList = new Point[pathNodes.Count];
+            for (int i = 0; i < pathNodes.Count; ++i)
+            {
+                _pointList[i] = _positionConvertPath(pathNodes.ElementAt(i));
+            }
+            pathNodes.Clear(); // Clear the original list
+            _model.ReleaseResourceMutex(Model.Model.MutexType.PATH_NODES);
+
+            return true;
         }
     }
 }

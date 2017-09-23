@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using LianLianXuan_Prj.View;
 
 namespace LianLianXuan_Prj.Model
 {
@@ -77,7 +76,7 @@ namespace LianLianXuan_Prj.Model
             }
 
             _gameState = GameState.PLAYING;
-            //_bgmPlayer.Play();
+            _bgmPlayer.Play();
 
             // Test();
         }

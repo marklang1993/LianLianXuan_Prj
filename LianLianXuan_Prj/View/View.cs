@@ -6,7 +6,7 @@ namespace LianLianXuan_Prj.View
     {
         protected Model.Model _model; // model
 
-        public View(Model.Model model)
+        protected View(Model.Model model)
         {
             _model = model;
         }
