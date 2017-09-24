@@ -35,6 +35,7 @@ namespace LianLianXuan_Prj
             // 2. Model
             _mainModel = new Model.Model();
             // - Bind all Views
+            _viewManager.Bind(new MainMenuView(_mainModel));
             _viewManager.Bind(new TipView(_mainModel));
             _viewManager.Bind(new MainView(_mainModel));
             _viewManager.Bind(new GameEndView(_mainModel, wigetSize));
@@ -72,9 +73,17 @@ namespace LianLianXuan_Prj
             }
         }
 
+        private void GameStage_MouseMove(object sender, MouseEventArgs e)
+        {
+            // Mouse Moving
+            _mainController.MouseMove(e.X, e.Y);
+        }
+
         private void GameStage_KeyUp(object sender, KeyEventArgs e)
         {
+            // Keyboard Key Up
             _mainController.KeyUp(e.KeyCode);
         }
+
     }
 }

@@ -7,7 +7,7 @@ namespace LianLianXuan_Prj.View
     public class TipView : DelayedDisplayView
     {
         private Point[] _pairList;
-        private Pen _boarderPen;
+        private readonly Pen _boarderPen;
 
 
         public TipView(Model.Model model)

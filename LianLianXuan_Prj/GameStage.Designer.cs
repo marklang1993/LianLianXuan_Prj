@@ -50,6 +50,7 @@
             this.Load += new System.EventHandler(this.GameStage_Load);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.GameStage_KeyUp);
             this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GameStage_MouseClick);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GameStage_MouseMove);
             this.ResumeLayout(false);
 
         }

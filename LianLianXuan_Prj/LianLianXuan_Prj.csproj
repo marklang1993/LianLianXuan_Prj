@@ -63,6 +63,7 @@
     <Compile Include="Model\Tuple.cs" />
     <Compile Include="View\DelayedDisplayView.cs" />
     <Compile Include="View\GameEndView.cs" />
+    <Compile Include="View\MainMenuView.cs" />
     <Compile Include="View\MainView.cs" />
     <Compile Include="View\PathView.cs" />
     <Compile Include="View\ScoreView.cs" />

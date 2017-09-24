@@ -41,9 +41,9 @@ namespace LianLianXuan_Prj.View
                TimeSpan timeElapsed = new TimeSpan(DateTime.Now.Ticks - score.GetTotalTicks());
                StringBuilder sb = new StringBuilder(@"目前得分：");
                sb.Append(score.GetTotalScore().ToString());
-               sb.Append(@"     目前连续炫技次数：");
+               sb.Append(@"     连连炫次数：");
                sb.Append(score.GetComboCount().ToString());
-               sb.Append(@"     炫技时间：");
+               sb.Append(@"     炫技用时：");
                sb.Append((int)timeElapsed.TotalSeconds);
                sb.Append(@" 秒");
                g.DrawString(sb.ToString(), _drawFont, _drawBrush, _drawLayout, _stringFormat);

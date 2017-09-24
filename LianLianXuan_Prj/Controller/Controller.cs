@@ -12,6 +12,19 @@ namespace LianLianXuan_Prj.Controller
         }
 
         /// <summary>
+        /// Mouse Moving Handler
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void MouseMove(int x, int y)
+        {
+            if (_model.GetState() == Model.Model.GameState.MAIN_MENU)
+            {
+                _model.MainMenuMouseMoveHandler(x, y);
+            }
+        }
+
+        /// <summary>
         /// Mouse Click Handler
         /// </summary>
         /// <param name="x">Mouse x position in pixel</param>
@@ -22,12 +35,23 @@ namespace LianLianXuan_Prj.Controller
             if (isRightClick)
             {
                 // Right
-                _model.RightClickHandler(x, y);
+                if (_model.GetState() == Model.Model.GameState.PLAYING)
+                {
+                    _model.GameRoundRightClickHandler(x, y);
+                }
             }
             else
             {
                 // Left
-                _model.LeftClickHandler(x, y);
+                if (_model.GetState() == Model.Model.GameState.PLAYING)
+                {
+                    _model.GameRoundLeftClickHandler(x, y);
+                }
+                else if (_model.GetState() == Model.Model.GameState.MAIN_MENU)
+                {
+                    // Main Menu
+                    _model.MainMenuLeftClickHandler(x, y);
+                }
             }
         }
 

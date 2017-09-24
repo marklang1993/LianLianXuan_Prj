@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace LianLianXuan_Prj.Model
 {
@@ -19,10 +21,13 @@ namespace LianLianXuan_Prj.Model
         // Define GameState
         public enum GameState
         {
-            START,
-            PLAYING,
-            PAUSE,
-            END
+            START, // All Game Resources are Initializing
+            MAIN_MENU, // Main Manu is Showing
+            ACHIEVEMENT, // Achievement is Showing
+            SCOREBOARD, // Scoreboard is Showing
+            PLAYING, // Game Round is Playing
+            PAUSE, // Game Round is Paused
+            END // Game Round is Ended
         };
 
         // Define MutexType
@@ -34,16 +39,19 @@ namespace LianLianXuan_Prj.Model
         }
 
         // Members
-        private Semaphore[] _resourceMutex;
+        private readonly Semaphore[] _resourceMutex;
         private readonly BGMPlayer _bgmPlayer;
         private readonly SEPlayer _sePlayer;
         private GameState _gameState;
+
+        private readonly Rectangle[] _cursorPosMainMenu; // Cursor positions for each item in Main Menu
+        private int _itemIdx; // Item Index in Main Menu - NOTE: -1 is invalid value
 
         private readonly Grid _grid; // The whole grid
         private readonly Tuple _tuple; // The selected blocks' position (only 2 blocks)
         private Tip _mergableTuple; // Block pair that can be merged
         private readonly Score _score; // Score
-        private List<Position> _pathNodes; // All turning, start, end points of a path 
+        private readonly List<Position> _pathNodes; // All turning, start, end points of a path
 
 
         /// <summary>
@@ -61,12 +69,20 @@ namespace LianLianXuan_Prj.Model
             }
             _bgmPlayer = new BGMPlayer();
             _sePlayer = new SEPlayer();
+
+            _cursorPosMainMenu = new Rectangle[4];
+            _cursorPosMainMenu[0] = new Rectangle(100, 300, 200, 100);
+            _cursorPosMainMenu[1] = new Rectangle(100, 410, 200, 100);
+            _cursorPosMainMenu[2] = new Rectangle(100, 520, 200, 100);
+            _cursorPosMainMenu[3] = new Rectangle(100, 630, 200, 100);
+            _itemIdx = -1;
+
             _grid = new Grid();
             _tuple = new Tuple(_grid);
             _score = new Score();
             _pathNodes = new List<Position>(4);
 
-            // Find is there any block pair that can be merged
+            // Initially, find is there any block pair that can be merged
             _mergableTuple = new Tip();
             _mergableTuple.Tuple = _findMergableBlockPair();
             while (_mergableTuple.Tuple == null)
@@ -75,11 +91,14 @@ namespace LianLianXuan_Prj.Model
                 _mergableTuple.Tuple = _findMergableBlockPair();
             }
 
-            _gameState = GameState.PLAYING;
+            // Switch game state to MAIN_MENU
+            _gameState = GameState.MAIN_MENU;
             _bgmPlayer.Play();
-
-            // Test();
         }
+
+
+        // =================================================== Game Internal Logic Processing Functions ===================================================
+
 
         /// <summary>
         /// Get binary tuple of start and end positions given current position by expanding horizontally
@@ -571,21 +590,6 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
-        /// Game End Related Processing
-        /// </summary>
-        private bool _gameEnd()
-        {
-            // Check
-            if (_grid.IsGameEnd())
-            {
-                // Game is end
-                _gameState = GameState.END;
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
         /// Find a Block Pair that can be merged
         /// </summary>
         /// <returns></returns>
@@ -645,17 +649,23 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
-        /// For DEBUG use only
+        /// Game End Related Processing
         /// </summary>
-        public void Test()
+        private bool _gameEnd()
         {
-            // Must set PRNG in grid by using seed = 10
-            Console.WriteLine(_isConnected(new Position(1, 1), new Position(10, 1), _grid));
-            Console.WriteLine(_isConnected(new Position(1, 7), new Position(2, 8), _grid));
-            Console.WriteLine(_isConnected(new Position(6, 4), new Position(8, 4), _grid));
-            Console.WriteLine(_isConnected(new Position(1, 1), new Position(9, 1), _grid));
-            Console.WriteLine(_isConnected(new Position(8, 2), new Position(10, 2), _grid));
+            // Check
+            if (_grid.IsGameEnd())
+            {
+                // Game is end
+                _gameState = GameState.END;
+                return true;
+            }
+            return false;
         }
+
+
+        // =================================================== Game Resources Related Operations ===================================================
+
 
         /// <summary>
         /// Acquire Resource Mutex
@@ -718,6 +728,20 @@ namespace LianLianXuan_Prj.Model
             return _mergableTuple;
         }
 
+
+        /// <summary>
+        /// Get Main Menu Item Area by Rectangle
+        /// </summary>
+        /// <returns></returns>
+        public Rectangle GetMainMenuItemArea()
+        {
+            if (_itemIdx >= 0)
+            {
+                return _cursorPosMainMenu[_itemIdx];
+            }
+            return new Rectangle(-1, -1, -1, -1);
+        }
+
         /// <summary>
         /// Get Current Game State
         /// </summary>
@@ -727,12 +751,72 @@ namespace LianLianXuan_Prj.Model
             return _gameState;
         }
 
+
+        // =================================================== Controller Action Handlers ===================================================
+
+
         /// <summary>
-        /// Mouse Right Click Handler
+        /// Mouse Position -> Item Index in Main Menu
         /// </summary>
         /// <param name="xMouse"></param>
         /// <param name="yMouse"></param>
-        public void RightClickHandler(int xMouse, int yMouse)
+        private void _determineItemIndexMainMenu(int xMouse, int yMouse)
+        {
+            for (int i = 0; i < _cursorPosMainMenu.Length; ++i)
+            {
+                if (_cursorPosMainMenu[i].Contains(xMouse, yMouse))
+                {
+                    // Contained such position, set Item Index
+                    _itemIdx = i;
+                    return;
+                }
+                _itemIdx = -1; // Set the Item Index to Invalid Index
+            }
+        }
+
+        /// <summary>
+        /// Mouse Moving Handler For Main Menu
+        /// </summary>
+        /// <param name="xMouse"></param>
+        /// <param name="yMouse"></param>
+        public void MainMenuMouseMoveHandler(int xMouse, int yMouse)
+        {
+            _determineItemIndexMainMenu(xMouse, yMouse);
+        }
+
+        /// <summary>
+        /// Mouse Left Click Handler For Main Menu
+        /// </summary>
+        /// <param name="xMouse"></param>
+        /// <param name="yMouse"></param>
+        public void MainMenuLeftClickHandler(int xMouse, int yMouse)
+        {
+            _determineItemIndexMainMenu(xMouse, yMouse);
+
+            // Determine Next Game State
+            switch (_itemIdx)
+            {
+                case 0:
+                    _gameState = GameState.PLAYING;
+                    break;
+                case 1:
+                    // _gameState = GameState.ACHIEVEMENT;
+                    break;
+                case 2:
+                    // _gameState = GameState.SCOREBOARD;
+                    break;
+                case 3:
+                    Application.Exit();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Mouse Right Click Handler For Game Round
+        /// </summary>
+        /// <param name="xMouse"></param>
+        /// <param name="yMouse"></param>
+        public void GameRoundRightClickHandler(int xMouse, int yMouse)
         {
             // Check the game state
             if (_gameState != GameState.PLAYING) return;
@@ -745,11 +829,11 @@ namespace LianLianXuan_Prj.Model
         }
 
         /// <summary>
-        /// Mouse Left Click Handler
+        /// Mouse Left Click Handler For Game Round
         /// </summary>
         /// <param name="xMouse"></param>
         /// <param name="yMouse"></param>
-        public void LeftClickHandler(int xMouse, int yMouse)
+        public void GameRoundLeftClickHandler(int xMouse, int yMouse)
         {
             // Check the game state
             if (_gameState != GameState.PLAYING) return;

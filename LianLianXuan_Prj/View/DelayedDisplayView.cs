@@ -6,7 +6,7 @@ namespace LianLianXuan_Prj.View
     public abstract class DelayedDisplayView : View
     {
         private DateTime _curTime;
-        public const int DISPLAY_TIME = 1000;
+        private const int DISPLAY_TIME = 1000;
 
 
         protected DelayedDisplayView(Model.Model model)
