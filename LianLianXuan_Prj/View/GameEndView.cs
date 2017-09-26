@@ -6,7 +6,7 @@ namespace LianLianXuan_Prj.View
     public class GameEndView : View
     {
         private readonly Bitmap _bgp; // Game End background picture
-        private Rectangle _wigetSize;
+        private Rectangle _drawSize;
 
         private Font _drawFont;
         private Brush _drawBrush;
@@ -16,12 +16,12 @@ namespace LianLianXuan_Prj.View
         /// Constructor
         /// </summary>
         /// <param name="model">Game Model</param>
-        public GameEndView(Model.Model model, Rectangle wigetSize)
+        /// <param name="drawSize">Drawing Size</param>
+        public GameEndView(Model.Model model, Rectangle drawSize)
             : base(model)
         {
             _bgp = new Bitmap(@"images/Win.jpg");
-            _model = model;
-            _wigetSize = wigetSize;
+            _drawSize = drawSize;
 
             _drawFont = new Font(@"黑体", 40);
             _drawBrush = new SolidBrush(Color.Aqua);
@@ -35,7 +35,7 @@ namespace LianLianXuan_Prj.View
             // Check the game state
             if (_model.GetState() == Model.Model.GameState.END)
             {
-                g.DrawImage(_bgp, _wigetSize);
+                g.DrawImage(_bgp, _drawSize);
                 g.DrawString(@"最终得分：" + _model.GetScore().GetTotalScore(), _drawFont, _drawBrush, 540, 580);
                 g.DrawString(@"连续炫技次数：" + _model.GetScore().GetMaxComboCount(), _drawFont, _drawBrush, 540, 660);
             }

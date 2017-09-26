@@ -8,8 +8,9 @@
 鼠标右键 - 取消选择
 M键 - 播放/停止背景音乐
 R键 - 打乱所有方块
+T键 - 显示提示
+Q键 - 返回主菜单
 Y键 - 游戏结束时再开一局
-
 
 
 LianLianXuan Project
@@ -22,4 +23,6 @@ Left Click  - Select a block
 Right Click - Cancel selection
 M           - Play / Stop background music
 R           - Randomize all existed blocks
-Y           - Start a new game when game is ended.
+T           - Give a tip
+Q           - Return to main menu
+Y           - Start a new game when game is ended

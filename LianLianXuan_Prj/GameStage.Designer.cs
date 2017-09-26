@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameStage));
             this.ViewUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
@@ -43,6 +44,7 @@
             this.ClientSize = new System.Drawing.Size(284, 262);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "GameStage";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

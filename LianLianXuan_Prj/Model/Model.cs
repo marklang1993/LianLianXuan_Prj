@@ -71,10 +71,10 @@ namespace LianLianXuan_Prj.Model
             _sePlayer = new SEPlayer();
 
             _cursorPosMainMenu = new Rectangle[4];
-            _cursorPosMainMenu[0] = new Rectangle(100, 300, 200, 100);
-            _cursorPosMainMenu[1] = new Rectangle(100, 410, 200, 100);
-            _cursorPosMainMenu[2] = new Rectangle(100, 520, 200, 100);
-            _cursorPosMainMenu[3] = new Rectangle(100, 630, 200, 100);
+            _cursorPosMainMenu[0] = new Rectangle(137, 544, 280, 75);
+            _cursorPosMainMenu[1] = new Rectangle(313, 648, 280, 75);
+            _cursorPosMainMenu[2] = new Rectangle(494, 747, 280, 75);
+            _cursorPosMainMenu[3] = new Rectangle(743, 845, 280, 75);
             _itemIdx = -1;
 
             _grid = new Grid();
@@ -797,7 +797,7 @@ namespace LianLianXuan_Prj.Model
             switch (_itemIdx)
             {
                 case 0:
-                    _gameState = GameState.PLAYING;
+                    RestartGame();
                     break;
                 case 1:
                     // _gameState = GameState.ACHIEVEMENT;
@@ -945,6 +945,15 @@ namespace LianLianXuan_Prj.Model
             _mergableTuple.Reset();
 
             _gameState = GameState.PLAYING;
+        }
+
+        /// <summary>
+        /// Return to Main Menu
+        /// </summary>
+        public void ReturnToMainMenu()
+        {
+            // Switch game state to MAIN_MENU
+            _gameState = GameState.MAIN_MENU;
         }
     }
 }

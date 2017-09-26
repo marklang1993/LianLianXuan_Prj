@@ -9,10 +9,10 @@ namespace LianLianXuan_Prj
     {
         private const int FPS = 30;
 
-        private const int DRAW_OFFSET_W = 28;
+        private const int DRAW_OFFSET_W = 20;
         private const int DRAW_OFFSET_H = 40;
 
-        private View.ViewManager _viewManager;
+        private ViewManager _viewManager;
         private Model.Model _mainModel;
         private Controller.Controller _mainController;
 
@@ -30,15 +30,15 @@ namespace LianLianXuan_Prj
             int wigetWidth = drawWidth + DRAW_OFFSET_W;
             int wigetHeight = drawHeight + DRAW_OFFSET_H;
             this.Size = new Size(wigetWidth, wigetHeight); // Reset size of the main form
-            Rectangle wigetSize = new Rectangle(0, 0, wigetWidth, wigetHeight);
-            _viewManager = new ViewManager(this.CreateGraphics(), wigetSize);
+            Rectangle drawSize = new Rectangle(0, 0, drawWidth, drawHeight);
+            _viewManager = new ViewManager(this.CreateGraphics(), drawSize);
             // 2. Model
             _mainModel = new Model.Model();
             // - Bind all Views
-            _viewManager.Bind(new MainMenuView(_mainModel));
+            _viewManager.Bind(new MainMenuView(_mainModel, drawSize));
             _viewManager.Bind(new TipView(_mainModel));
             _viewManager.Bind(new MainView(_mainModel));
-            _viewManager.Bind(new GameEndView(_mainModel, wigetSize));
+            _viewManager.Bind(new GameEndView(_mainModel, drawSize));
             _viewManager.Bind(new ScoreView(_mainModel, new Size(drawWidth, drawHeight)));
             _viewManager.Bind(new PathView(_mainModel));
             // 3. Controller
