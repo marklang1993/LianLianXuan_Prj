@@ -111,5 +111,14 @@ namespace LianLianXuan_Prj.Model
         {
             return _comboCountMax;
         }
+
+        /// <summary>
+        /// Get the times of asking tips
+        /// </summary>
+        /// <returns></returns>
+        public int GetTipTimes()
+        {
+            return _tipTimes;
+        }
     }
 }

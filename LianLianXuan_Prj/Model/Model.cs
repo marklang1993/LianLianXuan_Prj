@@ -23,7 +23,7 @@ namespace LianLianXuan_Prj.Model
         {
             START, // All Game Resources are Initializing
             MAIN_MENU, // Main Manu is Showing
-            ACHIEVEMENT, // Achievement is Showing
+            GUIDE, // Game Guide is Showing
             SCOREBOARD, // Scoreboard is Showing
             PLAYING, // Game Round is Playing
             PAUSE, // Game Round is Paused
@@ -43,6 +43,8 @@ namespace LianLianXuan_Prj.Model
         private readonly BGMPlayer _bgmPlayer;
         private readonly SEPlayer _sePlayer;
         private GameState _gameState;
+
+        private ScoreBoard _scoreBoard;
 
         private readonly Rectangle[] _cursorPosMainMenu; // Cursor positions for each item in Main Menu
         private int _itemIdx; // Item Index in Main Menu - NOTE: -1 is invalid value
@@ -67,6 +69,9 @@ namespace LianLianXuan_Prj.Model
             {
                 _resourceMutex[i] = new Semaphore(1, 1, @"LianLianXuan_ResourceMutex_" + i.ToString());
             }
+
+            _scoreBoard = new ScoreBoard();
+
             _bgmPlayer = new BGMPlayer();
             _sePlayer = new SEPlayer();
 
@@ -657,6 +662,11 @@ namespace LianLianXuan_Prj.Model
             if (_grid.IsGameEnd())
             {
                 // Game is end
+
+                // Update scoreboard
+                TimeSpan timeElapsed = new TimeSpan(DateTime.Now.Ticks - _score.GetTotalTicks());
+                _scoreBoard.Update(_score, (int)timeElapsed.TotalSeconds, "NO NAME");
+                // Switch state
                 _gameState = GameState.END;
                 return true;
             }
@@ -800,7 +810,7 @@ namespace LianLianXuan_Prj.Model
                     RestartGame();
                     break;
                 case 1:
-                    // _gameState = GameState.ACHIEVEMENT;
+                    // _gameState = GameState.GUIDE;
                     break;
                 case 2:
                     // _gameState = GameState.SCOREBOARD;
