@@ -819,7 +819,7 @@ namespace LianLianXuan_Prj.Model
                     RestartGame();
                     break;
                 case 1:
-                    // _gameState = GameState.GUIDE;
+                    _gameState = GameState.GUIDE;
                     break;
                 case 2:
                     _gameState = GameState.SCOREBOARD;

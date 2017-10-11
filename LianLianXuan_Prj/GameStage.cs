@@ -42,6 +42,7 @@ namespace LianLianXuan_Prj
             _viewManager.Bind(new ScoreView(_mainModel, new Size(drawWidth, drawHeight)));
             _viewManager.Bind(new PathView(_mainModel));
             _viewManager.Bind(new ScoreBoardView(_mainModel, drawSize));
+            _viewManager.Bind(new GuideView(_mainModel, drawSize));
             // 3. Controller
             _mainController = new Controller.Controller(_mainModel);
 
