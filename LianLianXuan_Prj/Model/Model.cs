@@ -740,6 +740,15 @@ namespace LianLianXuan_Prj.Model
 
 
         /// <summary>
+        /// Get score list from ScoreBoard
+        /// </summary>
+        /// <returns></returns>
+        public List<ScoreBoard.Score> GetScoreList()
+        {
+            return _scoreBoard.GetList();
+        }
+
+        /// <summary>
         /// Get Main Menu Item Area by Rectangle
         /// </summary>
         /// <returns></returns>
@@ -813,7 +822,7 @@ namespace LianLianXuan_Prj.Model
                     // _gameState = GameState.GUIDE;
                     break;
                 case 2:
-                    // _gameState = GameState.SCOREBOARD;
+                    _gameState = GameState.SCOREBOARD;
                     break;
                 case 3:
                     Application.Exit();

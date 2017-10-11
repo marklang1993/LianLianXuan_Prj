@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace LianLianXuan_Prj.Model
 {
@@ -45,20 +42,20 @@ namespace LianLianXuan_Prj.Model
 
                 int ret;
                 // 1. Total Score
-                ret = TotalScore.CompareTo(other.TotalScore);
+                ret = -1 * TotalScore.CompareTo(other.TotalScore);
                 if (ret != 0) return ret;
 
                 // 2. MaxCombos
-                ret = MaxCombos.CompareTo(other.MaxCombos);
+                ret = -1 * MaxCombos.CompareTo(other.MaxCombos);
                 if (ret != 0) return ret;
 
                 // 3. TimeElapsed
                 ret = TimeElapsed.CompareTo(other.TimeElapsed);
-                if (ret != 0) return ret * -1;
+                if (ret != 0) return ret;
 
                 // 4. TipTimes
                 ret = TipTimes.CompareTo(other.TipTimes);
-                if (ret != 0) return ret * -1;
+                if (ret != 0) return ret;
 
                 return ret;
             }
@@ -216,6 +213,16 @@ namespace LianLianXuan_Prj.Model
             {
                 ;
             }
+        }
+
+
+        /// <summary>
+        /// Get Score List
+        /// </summary>
+        /// <returns></returns>
+        public List<Score> GetList()
+        {
+            return _scoreList;
         }
     }
 }

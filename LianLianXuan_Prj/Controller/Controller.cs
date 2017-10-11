@@ -90,9 +90,19 @@ namespace LianLianXuan_Prj.Controller
                     _model.RestartGame();
                 }
             }
+            else if (key == Keys.N)
+            {
+                if (_model.GetState() == Model.Model.GameState.END)
+                {
+                    // Return to MainMenu
+                    _model.ReturnToMainMenu();
+                }
+            }
             else if (key == Keys.Q)
             {
-                if (_model.GetState() == Model.Model.GameState.PLAYING)
+                if (_model.GetState() == Model.Model.GameState.PLAYING ||
+                    _model.GetState() == Model.Model.GameState.SCOREBOARD ||
+                    _model.GetState() == Model.Model.GameState.GUIDE)
                 {
                     // Restart Game
                     _model.ReturnToMainMenu();
