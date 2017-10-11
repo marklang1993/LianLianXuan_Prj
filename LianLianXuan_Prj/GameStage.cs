@@ -35,14 +35,14 @@ namespace LianLianXuan_Prj
             // 2. Model
             _mainModel = new Model.Model();
             // - Bind all Views
-            _viewManager.Bind(new MainMenuView(_mainModel, drawSize));
             _viewManager.Bind(new TipView(_mainModel));
             _viewManager.Bind(new MainView(_mainModel));
-            _viewManager.Bind(new GameEndView(_mainModel, drawSize));
             _viewManager.Bind(new ScoreView(_mainModel, new Size(drawWidth, drawHeight)));
             _viewManager.Bind(new PathView(_mainModel));
-            _viewManager.Bind(new ScoreBoardView(_mainModel, drawSize));
-            _viewManager.Bind(new GuideView(_mainModel, drawSize));
+            _viewManager.Bind(new MainMenuView(_mainModel, drawSize, @"images/MainMenu.jpg"));
+            _viewManager.Bind(new GameEndView(_mainModel, drawSize, @"images/Win.jpg"));
+            _viewManager.Bind(new ScoreBoardView(_mainModel, drawSize, @"images/ScoreBoard.jpg"));
+            _viewManager.Bind(new GuideView(_mainModel, drawSize, @"images/Guide.jpg"));
             // 3. Controller
             _mainController = new Controller.Controller(_mainModel);
 

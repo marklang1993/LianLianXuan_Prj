@@ -4,11 +4,8 @@ using LianLianXuan_Prj.Model;
 
 namespace LianLianXuan_Prj.View
 {
-    public class ScoreBoardView : View
+    public class ScoreBoardView : BackGroundPictureView
     {
-        private readonly Bitmap _bgp; // Scoreboard background picture
-        private Rectangle _drawSize;
-
         private Font _drawFont;
         private Brush _titleDrawBrush;
         private Brush _scoreDrawBrush;
@@ -18,12 +15,9 @@ namespace LianLianXuan_Prj.View
 
         public const int NAME_MAX_LENGTH = 15; // Maximum length a name strings
 
-
-        public ScoreBoardView(Model.Model model, Rectangle drawSize)
-            : base(model)
+        public ScoreBoardView(Model.Model model, Rectangle drawSize, string picPath)
+            : base(model, drawSize, picPath)
         {
-            _bgp = new Bitmap(@"images/ScoreBoard.jpg");
-
             _drawFont = new Font(@"黑体", 16);
             _titleDrawBrush = new SolidBrush(Color.Red);
             _scoreDrawBrush = new SolidBrush(Color.Aqua);
@@ -31,7 +25,6 @@ namespace LianLianXuan_Prj.View
             _stringFormat.Alignment = StringAlignment.Center;
             _stringFormat.LineAlignment = StringAlignment.Center;
 
-            _drawSize = drawSize;
             _baseLayout = new RectangleF(0, 100, 120, 40);
         }
 
@@ -55,7 +48,7 @@ namespace LianLianXuan_Prj.View
                 RectangleF curLayout = _baseLayout;
 
                 // Paint Background
-                g.DrawImage(_bgp, _drawSize);
+                PaintBGP(g);
 
                 // Paint Title
                 g.DrawString(@"排名", _drawFont, _titleDrawBrush, curLayout, _stringFormat);

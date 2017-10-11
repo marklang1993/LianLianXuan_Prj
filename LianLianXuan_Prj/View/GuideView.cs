@@ -2,20 +2,11 @@
 
 namespace LianLianXuan_Prj.View
 {
-    public class GuideView : View
+    public class GuideView : BackGroundPictureView
     {
-        private readonly Bitmap _bgp; // Guide background picture
-        private Rectangle _drawSize;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="model">Game Model</param>
-        /// <param name="drawSize">Drawing Size</param>
-        public GuideView(Model.Model model, Rectangle drawSize) : base(model)
+        public GuideView(Model.Model model, Rectangle drawSize, string picPath)
+            : base(model, drawSize, picPath)
         {
-            _bgp = new Bitmap(@"images/Guide.jpg");
-            _drawSize = drawSize;
         }
 
         public override void Paint(Graphics g)
@@ -23,7 +14,7 @@ namespace LianLianXuan_Prj.View
             // Check the game state
             if (_model.GetState() == Model.Model.GameState.GUIDE)
             {
-                g.DrawImage(_bgp, _drawSize);
+                PaintBGP(g);
             }
         }
     }

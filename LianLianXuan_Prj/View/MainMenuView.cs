@@ -2,21 +2,14 @@
 
 namespace LianLianXuan_Prj.View
 {
-    public class MainMenuView : View
+    public class MainMenuView : BackGroundPictureView
     {
-        private readonly Bitmap _bgp; // MainMenu background picture
-        private Rectangle _drawSize;
-
         private readonly int _penSize;
         private readonly Pen _rectPen;
 
-        public MainMenuView(Model.Model model, Rectangle drawSize) 
-            : base(model)
+        public MainMenuView(Model.Model model, Rectangle drawSize, string picPath) : base(model, drawSize, picPath)
         {
             // Init.
-            _bgp = new Bitmap(@"images/MainMenu.jpg");
-            _drawSize = drawSize;
-
             _penSize = 3;
             _rectPen = new Pen(Color.Blue, _penSize);
         }
@@ -26,7 +19,7 @@ namespace LianLianXuan_Prj.View
             // Check the game state
             if (_model.GetState() == Model.Model.GameState.MAIN_MENU)
             {
-                g.DrawImage(_bgp, _drawSize); // Draw BGP
+                PaintBGP(g);
 
                 Rectangle drawingArea = _model.GetMainMenuItemArea();
                 if (drawingArea.X >= 0)
