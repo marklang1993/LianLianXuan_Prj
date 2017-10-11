@@ -33,7 +33,7 @@ namespace LianLianXuan_Prj
             Rectangle drawSize = new Rectangle(0, 0, drawWidth, drawHeight);
             _viewManager = new ViewManager(this.CreateGraphics(), drawSize);
             // 2. Model
-            _mainModel = new Model.Model();
+            _mainModel = new Model.Model(this);
             // - Bind all Views
             _viewManager.Bind(new TipView(_mainModel));
             _viewManager.Bind(new MainView(_mainModel));

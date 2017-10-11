@@ -65,6 +65,12 @@
     <Compile Include="Model\SEPlayer.cs" />
     <Compile Include="Model\Tip.cs" />
     <Compile Include="Model\Tuple.cs" />
+    <Compile Include="NameInputDialogue.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NameInputDialogue.Designer.cs">
+      <DependentUpon>NameInputDialogue.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\BackGroundPictureView.cs" />
     <Compile Include="View\DelayedDisplayView.cs" />
     <Compile Include="View\GameEndView.cs" />
@@ -81,6 +87,9 @@
     <Compile Include="View\ViewManager.cs" />
     <EmbeddedResource Include="GameStage.resx">
       <DependentUpon>GameStage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NameInputDialogue.resx">
+      <DependentUpon>NameInputDialogue.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

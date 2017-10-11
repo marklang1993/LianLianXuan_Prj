@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Windows.Forms;
 
 
 namespace LianLianXuan_Prj.Model
@@ -185,16 +187,20 @@ namespace LianLianXuan_Prj.Model
             file.Close();
         }
 
-
         /// <summary>
         /// Update Score Board
         /// </summary>
-        public void Update(LianLianXuan_Prj.Model.Score rawScore, int timeElapsed, string name)
+        public void Update(Form parentForm, LianLianXuan_Prj.Model.Score rawScore, int timeElapsed)
         {
+            // Get Name
+            StringBuilder name = new StringBuilder(@"NO NAME");
+            NameInputDialogue nameInputDialogue = new NameInputDialogue(name);
+            nameInputDialogue.ShowDialog(parentForm);
+
             // Create new score instance
             Score score = new Score();
             score.IsValid = true;
-            score.Name = name;
+            score.Name = name.ToString();
             score.TotalScore = rawScore.GetTotalScore();
             score.MaxCombos = rawScore.GetMaxComboCount();
             score.TimeElapsed = timeElapsed;

@@ -39,6 +39,8 @@ namespace LianLianXuan_Prj.Model
         }
 
         // Members
+        private readonly Form _parentForm;
+
         private readonly Semaphore[] _resourceMutex;
         private readonly BGMPlayer _bgmPlayer;
         private readonly SEPlayer _sePlayer;
@@ -59,9 +61,10 @@ namespace LianLianXuan_Prj.Model
         /// <summary>
         /// Constructor
         /// </summary>
-        public Model()
+        public Model(Form parentForm)
         {
             // Init.
+            _parentForm = parentForm;
             _gameState = GameState.START;
 
             _resourceMutex = new Semaphore[(int)MutexType.SIZE];
@@ -665,7 +668,7 @@ namespace LianLianXuan_Prj.Model
 
                 // Update scoreboard
                 TimeSpan timeElapsed = new TimeSpan(DateTime.Now.Ticks - _score.GetTotalTicks());
-                _scoreBoard.Update(_score, (int)timeElapsed.TotalSeconds, "NO NAME");
+                _scoreBoard.Update(_parentForm, _score, (int)timeElapsed.TotalSeconds);
                 // Switch state
                 _gameState = GameState.END;
                 return true;

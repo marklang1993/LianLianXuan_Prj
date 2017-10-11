@@ -13,7 +13,7 @@ namespace LianLianXuan_Prj.View
 
         private RectangleF _baseLayout;
 
-        public const int NAME_MAX_LENGTH = 15; // Maximum length a name strings
+        public const int NAME_MAX_LENGTH = 11; // Maximum length a name strings
 
         public ScoreBoardView(Model.Model model, Rectangle drawSize, string picPath)
             : base(model, drawSize, picPath)
@@ -25,7 +25,7 @@ namespace LianLianXuan_Prj.View
             _stringFormat.Alignment = StringAlignment.Center;
             _stringFormat.LineAlignment = StringAlignment.Center;
 
-            _baseLayout = new RectangleF(0, 100, 120, 40);
+            _baseLayout = new RectangleF(0, 60, 140, 50);
         }
 
         private void _layoutMoveNextHorizontal(ref RectangleF layout)
@@ -76,7 +76,18 @@ namespace LianLianXuan_Prj.View
                         _layoutMoveNextHorizontal(ref curLayout);
                         g.DrawString(score.Name, _drawFont, _scoreDrawBrush, curLayout, _stringFormat);
                         _layoutMoveNextHorizontal(ref curLayout);
-                        g.DrawString(score.TotalScore.ToString(), _drawFont, _scoreDrawBrush, curLayout, _stringFormat);
+
+                        if (score.TotalScore < 0)
+                        {
+                            int posScore = score.TotalScore*-1;
+                            string strScore = @"－" + posScore;
+                            g.DrawString(strScore, _drawFont, _scoreDrawBrush, curLayout, _stringFormat);
+                        }
+                        else
+                        {
+                            g.DrawString(score.TotalScore.ToString(), _drawFont, _scoreDrawBrush, curLayout, _stringFormat);
+                        }
+
                         _layoutMoveNextHorizontal(ref curLayout);
                         g.DrawString(score.MaxCombos.ToString(), _drawFont, _scoreDrawBrush, curLayout, _stringFormat);
                         _layoutMoveNextHorizontal(ref curLayout);
