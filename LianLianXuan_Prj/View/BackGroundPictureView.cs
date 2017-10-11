@@ -4,8 +4,8 @@ namespace LianLianXuan_Prj.View
 {
     public abstract class BackGroundPictureView : View
     {
-        protected readonly Bitmap _bgp; // Guide background picture
-        protected Rectangle _drawSize;
+        private readonly Bitmap _bgp; // Guide background picture
+        private Rectangle _drawSize;
 
         protected BackGroundPictureView(Model.Model model, Rectangle drawSize, string picPath) : base(model)
         {

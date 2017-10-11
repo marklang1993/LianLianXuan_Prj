@@ -25,7 +25,6 @@ namespace LianLianXuan_Prj.View
             if (_model.GetState() == Model.Model.GameState.END)
             {
                 PaintBGP(g);
-                g.DrawImage(_bgp, _drawSize);
                 g.DrawString(@"最终得分：" + _model.GetScore().GetTotalScore(), _drawFont, _drawBrush, 540, 580);
                 g.DrawString(@"连续炫技次数：" + _model.GetScore().GetMaxComboCount(), _drawFont, _drawBrush, 540, 660);
             }

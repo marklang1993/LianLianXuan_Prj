@@ -84,6 +84,7 @@ namespace LianLianXuan_Prj.Model
         {
             // File processing
             _scoreList = new List<Score>();
+            _fileName = @"score.lst";
 
             // Loading
             try
@@ -93,7 +94,7 @@ namespace LianLianXuan_Prj.Model
             catch (Exception ex)
             {
                 // Cannot found score board file
-                FileStream file = new FileStream("score.lst", FileMode.Create);
+                FileStream file = new FileStream(_fileName, FileMode.Create);
                 file.Close();
 
                 for (int i = 0; i < MAX_RECORDS; ++i)
@@ -111,7 +112,7 @@ namespace LianLianXuan_Prj.Model
         /// </summary>
         private void _readFile()
         {
-            FileStream file = new FileStream("score.lst", FileMode.Open);
+            FileStream file = new FileStream(_fileName, FileMode.Open);
 
             // Score board file found -- Read
             BinaryReader binaryReader = new BinaryReader(file);
@@ -153,7 +154,7 @@ namespace LianLianXuan_Prj.Model
         /// </summary>
         private void _writeFile()
         {
-            FileStream file = new FileStream("score.lst", FileMode.Create);
+            FileStream file = new FileStream(_fileName, FileMode.Create);
 
             // Score board file found -- Write
             BinaryWriter binaryWriter = new BinaryWriter(file);
@@ -211,7 +212,6 @@ namespace LianLianXuan_Prj.Model
             }
             catch (Exception ex)
             {
-                ;
             }
         }
 
